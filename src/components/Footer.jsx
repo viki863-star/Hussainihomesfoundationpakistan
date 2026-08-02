@@ -14,6 +14,7 @@ export default function Footer() {
     { href: '#services', label: f.links.services },
     { href: '#building', label: f.links.building },
     { href: '#gallery', label: f.links.gallery },
+    { href: withBase('/admin'), label: 'Admin' },
   ];
 
   const supportLinks = [
