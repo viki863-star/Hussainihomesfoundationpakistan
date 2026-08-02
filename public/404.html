@@ -5,9 +5,8 @@
     <title>Hussaini Homes Foundation</title>
     <script>
       (function () {
-        var path = location.pathname.replace(/^\/[^/]+/, '');
-        var target = location.origin + '/Hussainihomesfoundationpakistan/' + path.replace(/^\//, '') + location.search + location.hash;
-        location.replace(target);
+        sessionStorage.setItem('hh-redirect', location.href);
+        location.replace(location.origin + '/Hussainihomesfoundationpakistan/');
       })();
     </script>
   </head>

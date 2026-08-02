@@ -44,6 +44,17 @@
     <!-- Preconnect for fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script>
+      (function () {
+        try {
+          var r = sessionStorage.getItem('hh-redirect');
+          if (r) {
+            sessionStorage.removeItem('hh-redirect');
+            history.replaceState(null, '', r);
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
