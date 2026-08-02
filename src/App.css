@@ -2442,6 +2442,25 @@
   letter-spacing: 0;
 }
 
+/* Nastaliq glyphs are taller than the line box — stop clipping them */
+.urdu-mode .hero-headline {
+  overflow: visible;
+  padding-bottom: 0.15em;
+}
+.urdu-mode .hero-line {
+  overflow: visible;
+  padding: 0.18em 0;
+}
+.urdu-mode .hero-line-inner {
+  animation: heroLineFade 1s var(--ease-out-expo) forwards;
+  opacity: 0;
+  transform: none;
+}
+@keyframes heroLineFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* Scroll snap for mobile (opt-in) */
 @media (max-width: 768px) {
   .hero-content { text-align: center; }
