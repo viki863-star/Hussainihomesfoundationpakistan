@@ -4,7 +4,7 @@ import { handleApi } from './server/admin-api.js'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/Hussainihomesfoundationpakistan/',
+  base: process.env.VITE_BASE_PATH || '/Hussainihomesfoundationpakistan/',
   plugins: [
     react(),
     {
