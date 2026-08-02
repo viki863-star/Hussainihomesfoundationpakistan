@@ -1,5 +1,6 @@
 import { useLang } from '../LangContext';
 import { useSiteImages } from '../siteImages';
+import { withBase } from '../paths';
 
 export default function Footer() {
   const { t, isUrdu } = useLang();
@@ -84,7 +85,7 @@ export default function Footer() {
         <div className="footer-bottom">
           <span>{f.copyright}</span>
           <div className="footer-bottom-right">
-            <a href="/admin" className="footer-admin-link">Admin</a>
+            <a href={withBase('/admin')} className="footer-admin-link">Admin</a>
             {f.madeWith} <span className="footer-bottom-heart">❤</span> {f.forChildren}
           </div>
         </div>

@@ -249,7 +249,7 @@ function HomePage() {
 export default function App() {
   return (
     <LangProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/team/:id" element={<TeamDetail />} />
