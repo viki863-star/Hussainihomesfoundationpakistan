@@ -1,0 +1,356 @@
+{
+  "items": [
+    {
+      "id": "gallery-01",
+      "icon": "🏠",
+      "cat": "building",
+      "src": "/images/gallery/gallery-01.jpg",
+      "span": true,
+      "label": {
+        "en": "Building — Front View",
+        "ur": "عمارت — سامنے کا منظر"
+      },
+      "detail": {
+        "en": "The front view of our orphan care home in Parachinar, Lower Kurram.",
+        "ur": "پاراچنار، لوئر کرم میں ہمارے یتیم خانے کا سامنے کا منظر۔"
+      }
+    },
+    {
+      "id": "gallery-02",
+      "icon": "🏗️",
+      "cat": "building",
+      "src": "/images/gallery/gallery-02.jpg",
+      "label": {
+        "en": "Construction Progress",
+        "ur": "تعمیراتی پیشرفت"
+      },
+      "detail": {
+        "en": "Our building under construction — growing toward a safer home for the children.",
+        "ur": "ہماری عمارت زیرِ تعمیر — بچوں کے لیے ایک محفوظ گھر کی جانب بڑھتے ہوئے۔"
+      }
+    },
+    {
+      "id": "gallery-03",
+      "icon": "🏗️",
+      "cat": "building",
+      "src": "/images/gallery/gallery-03.jpg",
+      "label": {
+        "en": "Building View",
+        "ur": "عمارت کا منظر"
+      },
+      "detail": {
+        "en": "A view of the building as it takes shape.",
+        "ur": "عمارت کا ایک منظر جو شکل اختیار کر رہی ہے۔"
+      }
+    },
+    {
+      "id": "gallery-04",
+      "icon": "🏗️",
+      "cat": "building",
+      "src": "/images/gallery/gallery-04.jpg",
+      "label": {
+        "en": "Building View 2",
+        "ur": "عمارت کا منظر ۲"
+      },
+      "detail": {
+        "en": "Another angle of the building complex.",
+        "ur": "عمارت کمپلیکس کا ایک اور زاویہ۔"
+      }
+    },
+    {
+      "id": "gallery-05",
+      "icon": "📋",
+      "cat": "foundation",
+      "src": "/images/gallery/gallery-05.jpg",
+      "label": {
+        "en": "Foundation Logo",
+        "ur": "بنیادی لوگو"
+      },
+      "detail": {
+        "en": "The official logo of Hussaini Homes Foundation.",
+        "ur": "حسینی ہومز فاؤنڈیشن کا سرکاری لوگو۔"
+      }
+    },
+    {
+      "id": "gallery-06",
+      "icon": "🕌",
+      "cat": "foundation",
+      "src": "/images/gallery/gallery-06.jpg",
+      "label": {
+        "en": "Foundation Emblem",
+        "ur": "بنیادی نشان"
+      },
+      "detail": {
+        "en": "The emblem representing our mission of care and education.",
+        "ur": "ہمارے مشنِ خدمت و تعلیم کی نمائندگی کرنے والا نشان۔"
+      }
+    },
+    {
+      "id": "gallery-07",
+      "icon": "👨‍👩‍👧‍👦",
+      "cat": "students",
+      "src": "/images/gallery/gallery-07.jpg",
+      "span": true,
+      "label": {
+        "en": "Group Photo",
+        "ur": "گروپ تصویر"
+      },
+      "detail": {
+        "en": "All our children together — one big family of 31.",
+        "ur": "ہمارے تمام بچے اکٹھے — ۳۱ کا ایک بڑا خاندان۔"
+      }
+    },
+    {
+      "id": "gallery-08",
+      "icon": "👨‍👩‍👧‍👦",
+      "cat": "students",
+      "src": "/images/gallery/gallery-08.jpg",
+      "label": {
+        "en": "Group Photo 2",
+        "ur": "گروپ تصویر ۲"
+      },
+      "detail": {
+        "en": "The children gathered together for a group photo.",
+        "ur": "بچے ایک گروپ تصویر کے لیے جمع ہوئے۔"
+      }
+    },
+    {
+      "id": "gallery-09",
+      "icon": "🕌",
+      "cat": "prayer",
+      "src": "/images/gallery/gallery-09.jpg",
+      "label": {
+        "en": "Students in Prayer",
+        "ur": "بچے نماز میں"
+      },
+      "detail": {
+        "en": "The children offering their prayers with devotion.",
+        "ur": "بچے پوری عقیدت کے ساتھ نماز ادا کر رہے ہیں۔"
+      }
+    },
+    {
+      "id": "gallery-10",
+      "icon": "🕌",
+      "cat": "prayer",
+      "src": "/images/gallery/gallery-10.jpg",
+      "label": {
+        "en": "Prayer Time",
+        "ur": "نماز کا وقت"
+      },
+      "detail": {
+        "en": "A quiet moment of prayer at the home.",
+        "ur": "گھر میں نماز کا ایک پر سکون لمحہ۔"
+      }
+    },
+    {
+      "id": "gallery-11",
+      "icon": "🕌",
+      "cat": "prayer",
+      "src": "/images/gallery/gallery-11.jpg",
+      "label": {
+        "en": "Prayer Time",
+        "ur": "نماز کا وقت"
+      },
+      "detail": {
+        "en": "Prayer time at Hussaini Homes.",
+        "ur": "حسینی ہومز میں نماز کا وقت۔"
+      }
+    },
+    {
+      "id": "gallery-12",
+      "icon": "🕌",
+      "cat": "prayer",
+      "src": "/images/gallery/gallery-12.jpg",
+      "label": {
+        "en": "Prayer Time",
+        "ur": "نماز کا وقت"
+      },
+      "detail": {
+        "en": "Children praying together in congregation.",
+        "ur": "بچے باجماعت نماز پڑھ رہے ہیں۔"
+      }
+    },
+    {
+      "id": "gallery-13",
+      "icon": "🍽️",
+      "cat": "meals",
+      "src": "/images/gallery/gallery-13.jpg",
+      "label": {
+        "en": "Together at the Table",
+        "ur": "ساتھ میز پر"
+      },
+      "detail": {
+        "en": "The children sharing a meal together at the table.",
+        "ur": "بچے ایک ساتھ میز پر کھانا شئیر کر رہے ہیں۔"
+      }
+    },
+    {
+      "id": "gallery-14",
+      "icon": "🍽️",
+      "cat": "meals",
+      "src": "/images/gallery/gallery-14.jpg",
+      "label": {
+        "en": "Meal Time",
+        "ur": "کھانے کا وقت"
+      },
+      "detail": {
+        "en": "Meal time — healthy food for growing children.",
+        "ur": "کھانے کا وقت — بڑھتے بچوں کے لیے صحت بخش غذا۔"
+      }
+    },
+    {
+      "id": "gallery-15",
+      "icon": "🏫",
+      "cat": "school",
+      "src": "/images/gallery/gallery-15.jpg",
+      "label": {
+        "en": "School Activities",
+        "ur": "اسکول کی سرگرمیاں"
+      },
+      "detail": {
+        "en": "School activities inside our classrooms.",
+        "ur": "ہمارے کلاس رومز میں اسکول کی سرگرمیاں۔"
+      }
+    },
+    {
+      "id": "gallery-16",
+      "icon": "🏫",
+      "cat": "school",
+      "src": "/images/gallery/gallery-16.jpg",
+      "label": {
+        "en": "In the Classroom",
+        "ur": "کلاس روم میں"
+      },
+      "detail": {
+        "en": "The children learning attentively in the classroom.",
+        "ur": "کلاس روم میں توجہ سے سیکھتے ہوئے بچے۔"
+      }
+    },
+    {
+      "id": "gallery-17",
+      "icon": "🏫",
+      "cat": "school",
+      "src": "/images/gallery/gallery-17.jpg",
+      "label": {
+        "en": "Learning Together",
+        "ur": "مل کر سیکھنا"
+      },
+      "detail": {
+        "en": "Students learning together with their teachers.",
+        "ur": "طلباء اپنے اساتذہ کے ساتھ مل کر سیکھ رہے ہیں۔"
+      }
+    },
+    {
+      "id": "gallery-18",
+      "icon": "🏫",
+      "cat": "school",
+      "src": "/images/gallery/gallery-18.jpg",
+      "label": {
+        "en": "School Day",
+        "ur": "اسکول کا دن"
+      },
+      "detail": {
+        "en": "A typical school day at the home.",
+        "ur": "گھر کا ایک عام اسکول کا دن۔"
+      }
+    },
+    {
+      "id": "gallery-19",
+      "icon": "📚",
+      "cat": "school",
+      "src": "/images/gallery/gallery-19.jpg",
+      "label": {
+        "en": "Study Time",
+        "ur": "مطالعے کا وقت"
+      },
+      "detail": {
+        "en": "Focused study time after school.",
+        "ur": "اسکول کے بعد توجہ سے مطالعہ۔"
+      }
+    },
+    {
+      "id": "gallery-20",
+      "icon": "📚",
+      "cat": "school",
+      "src": "/images/gallery/gallery-20.jpg",
+      "label": {
+        "en": "Study Time",
+        "ur": "مطالعے کا وقت"
+      },
+      "detail": {
+        "en": "The children busy with their homework.",
+        "ur": "بچے اپنے ہوم ورک میں مصروف۔"
+      }
+    },
+    {
+      "id": "gallery-21",
+      "icon": "📚",
+      "cat": "school",
+      "src": "/images/gallery/gallery-21.jpg",
+      "label": {
+        "en": "Study Time",
+        "ur": "مطالعے کا وقت"
+      },
+      "detail": {
+        "en": "Quiet concentration during study hour.",
+        "ur": "مطالعے کے وقت خاموش توجہ۔"
+      }
+    },
+    {
+      "id": "gallery-22",
+      "icon": "📚",
+      "cat": "school",
+      "src": "/images/gallery/gallery-22.jpg",
+      "label": {
+        "en": "Homework Time",
+        "ur": "ہوم ورک کا وقت"
+      },
+      "detail": {
+        "en": "Homework time in the evening.",
+        "ur": "شام کے وقت ہوم ورک۔"
+      }
+    },
+    {
+      "id": "gallery-23",
+      "icon": "📚",
+      "cat": "school",
+      "src": "/images/gallery/gallery-23.jpg",
+      "label": {
+        "en": "Study Corner",
+        "ur": "مطالعے کی جگہ"
+      },
+      "detail": {
+        "en": "A dedicated corner for studies.",
+        "ur": "مطالعے کے لیے ایک مخصوص جگہ۔"
+      }
+    },
+    {
+      "id": "gallery-24",
+      "icon": "🎤",
+      "cat": "events",
+      "src": "/images/gallery/gallery-24.jpg",
+      "label": {
+        "en": "Chairman's Lecture",
+        "ur": "چیئرمین کا خطاب"
+      },
+      "detail": {
+        "en": "Chairman Iftikhar Hussain Ifti giving a lecture to the students.",
+        "ur": "چیئرمین افتخار حسین اِفتی طلباء کو خطاب دے رہے ہیں۔"
+      }
+    },
+    {
+      "id": "gallery-25",
+      "icon": "🎉",
+      "cat": "events",
+      "src": "/images/gallery/gallery-25.jpg",
+      "label": {
+        "en": "Opening Ceremony",
+        "ur": "افتتاحی تقریب"
+      },
+      "detail": {
+        "en": "The opening ceremony of the orphan care home.",
+        "ur": "یتیم خانے کی افتتاحی تقریب۔"
+      }
+    }
+  ]
+}

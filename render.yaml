@@ -1,0 +1,10 @@
+# Render blueprint — deploy the website + admin panel on Render (free tier)
+# Use: New Web Service → Connect this GitHub repo → Render auto-detects this file.
+services:
+  - type: web
+    name: hussaini-homes
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
