@@ -28,6 +28,11 @@ const MIME = {
   '.ttf': 'font/ttf',
 };
 
+// Built assets may be prefixed with a subpath base (e.g. GitHub Pages build),
+// while server.js serves them from the dist root. Strip that prefix so either
+// build works here.
+const BASE_PREFIX = 'Hussainihomesfoundationpakistan/';
+
 function serveStatic(req, res, urlPath) {
   let rel;
   try {
@@ -35,6 +40,7 @@ function serveStatic(req, res, urlPath) {
   } catch {
     res.writeHead(400); res.end('Bad request'); return;
   }
+  if (rel.startsWith(BASE_PREFIX)) rel = rel.slice(BASE_PREFIX.length);
   if (!rel) rel = 'index.html';
 
   const filePath = path.resolve(DIST, rel);
