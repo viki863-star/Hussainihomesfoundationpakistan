@@ -246,10 +246,18 @@ function HomePage() {
 }
 
 /* ---- App ---- */
+// The build bakes a subpath base (e.g. GitHub Pages), but Render serves the
+// same build from the site root. Only require the base in the URL when the
+// page actually sits under it, so one build works on both.
+function routerBasename() {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return base && window.location.pathname.startsWith(base) ? base : '';
+}
+
 export default function App() {
   return (
     <LangProvider>
-      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+      <BrowserRouter basename={routerBasename()}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/team/:id" element={<TeamDetail />} />
