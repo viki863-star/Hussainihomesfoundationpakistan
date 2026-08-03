@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hussainihomes.org/sitemap.xml
+Sitemap: https://hussainihomesfoundationpakistan.onrender.com/sitemap.xml
