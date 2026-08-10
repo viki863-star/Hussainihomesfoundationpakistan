@@ -89,7 +89,7 @@
   width: 60px;
   height: 60px;
   flex-shrink: 0;
-  border-radius: 14px;
+  border-radius: 50%;
   overflow: hidden;
   background: #ffffff;
   box-shadow:
@@ -908,7 +908,7 @@
 .hero-chip-logo {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: 50%;
   object-fit: cover;
   background: #fff;
   flex-shrink: 0;
@@ -2551,7 +2551,7 @@
 .footer-logo {
   width: 48px;
   height: 48px;
-  border-radius: 10px;
+  border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
 }

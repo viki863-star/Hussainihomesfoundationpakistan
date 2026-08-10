@@ -675,9 +675,9 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
 .preloader-logo {
   width: 88px;
   height: 88px;
-  border-radius: 20px;
+  border-radius: 50%;
   object-fit: cover;
-  animation: preloaderPulse 1.2s ease-in-out infinite;
+  animation: preloaderPulse 1.2s ease-in-in infinite;
 }
 .preloader-bar {
   width: 160px;

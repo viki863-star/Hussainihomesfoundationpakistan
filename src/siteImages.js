@@ -7,7 +7,7 @@ export const SITE_IMAGE_DEFAULTS = {
   constructionBegin: withBase('/images/construction-beginning.webp'),
   constructionToday: withBase('/images/construction-today.webp'),
   constructionPoster: withBase('/images/construction-journey-poster.webp'),
-  logo: withBase('/images/LOGO.png'),
+  logo: withBase('/images/Logo HH.jfif'),
 };
 
 let cache = null;

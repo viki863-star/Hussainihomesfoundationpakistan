@@ -30,7 +30,8 @@
 .adm-login-logo {
   width: 92px;
   height: 92px;
-  object-fit: contain;
+  border-radius: 50%;
+  object-fit: cover;
   margin-bottom: 18px;
 }
 .adm-login-title {
@@ -138,7 +139,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 .adm-header-left { display: flex; align-items: center; gap: 10px; }
-.adm-header-logo { width: 38px; height: 38px; object-fit: contain; }
+.adm-header-logo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
 .adm-header-title { font-weight: 800; color: #201a17; font-size: 1.02rem; }
 .adm-tabs { display: flex; gap: 4px; }
 .adm-tab {
