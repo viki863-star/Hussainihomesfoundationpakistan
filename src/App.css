@@ -44,6 +44,34 @@
 }
 .navbar.scrolled .navbar-inner { height: 72px; }
 
+/* Skip to content link */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip-link:focus {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 99999;
+  width: auto;
+  height: auto;
+  padding: 12px 24px;
+  background: var(--crimson);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  outline: 3px solid var(--gold);
+}
+
 /* ═══ ENHANCED LOGO ═══ */
 .nav-logo {
   display: flex;
@@ -139,7 +167,7 @@
 .nav-links a {
   position: relative;
   display: inline-block;
-  padding: 8px 16px;
+  padding: 12px 20px;
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 500;

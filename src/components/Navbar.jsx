@@ -152,22 +152,6 @@ export default function Navbar({ activeSection = 'home' }) {
             </div>
           </div>
 
-          {/* Desktop controls: theme + lang toggle */}
-          <div className="nav-desktop-controls">
-            <ThemeToggle isDark={isDark} onClick={toggleTheme} />
-            <button
-              className={`lang-toggle-pill lang-toggle-pill-desktop${isUrdu ? ' lang-toggle-pill-ur' : ''}`}
-              onClick={toggle}
-              aria-label="Switch language"
-            >
-              <span className="lang-pill-track">
-                <span className="lang-pill-thumb" />
-              </span>
-              <span className="lang-pill-en">EN</span>
-              <span className="lang-pill-ur">اردو</span>
-            </button>
-          </div>
-
         </div>
       </nav>
     </>

@@ -120,6 +120,7 @@ export default function BuildingProgress() {
               className="building-img-main"
               src={withBase('/images/Bulding Pic 2.jpeg')}
               alt="Building under construction"
+              loading="lazy"
             />
             <div className="facilities-wrap">
               <h4 className="facilities-title">

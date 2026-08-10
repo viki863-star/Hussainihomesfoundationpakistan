@@ -223,20 +223,23 @@ function HomePage() {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <Preloader />
       <CustomCursor />
       <Navbar activeSection={activeSection} />
-      <Hero />
-      <MarqueeTicker items={t.marquee} />
-      <About />
-      <Services />
-      <Team />
-      <BuildingProgress />
-      <ConstructionProgress />
-      <Gallery />
-      <SuccessStories />
-      <Donate />
-      <Contact />
+      <div id="main-content">
+        <Hero />
+        <MarqueeTicker items={t.marquee} />
+        <About />
+        <Services />
+        <Team />
+        <BuildingProgress />
+        <ConstructionProgress />
+        <Gallery />
+        <SuccessStories />
+        <Donate />
+        <Contact />
+      </div>
       <Footer />
       <FloatingDonate label={t.nav.donate} />
       <FloatingWhatsApp />

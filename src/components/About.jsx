@@ -19,11 +19,13 @@ export default function About() {
                 className="about-img-main"
                 src={imgs.aboutBuilding}
                 alt="Hussaini Home Orphan Care Center"
+                loading="lazy"
               />
               <img
                 className="about-img-accent"
                 src={imgs.heroBuilding}
                 alt="Building exterior"
+                loading="lazy"
               />
               <div className="about-years-badge">
                 <span className="about-years-number">{a.years}</span>
