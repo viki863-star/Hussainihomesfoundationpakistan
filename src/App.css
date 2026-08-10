@@ -58,65 +58,35 @@
 
 .nav-logo-img-wrap {
   position: relative;
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   flex-shrink: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.25),
+    inset 0 0 0 1px rgba(185,28,28,0.18);
+  transition: box-shadow 0.4s ease, transform 0.4s var(--ease-out-expo);
+}
+.nav-logo:hover .nav-logo-img-wrap {
+  box-shadow:
+    0 6px 22px rgba(251,191,36,0.4),
+    inset 0 0 0 1px rgba(185,28,28,0.25);
+  transform: translateY(-1px);
 }
 
-/* Rotating outer ring */
-.nav-logo-ring {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-.nav-logo-ring-outer {
-  inset: -5px;
-  border: 2px solid transparent;
-  background: conic-gradient(from 0deg, var(--crimson), var(--gold), var(--crimson)) border-box;
-  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
-  animation: spinSlow 6s linear infinite;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-.nav-logo-ring-inner {
-  inset: -2px;
-  border: 1px solid rgba(251,191,36,0.25);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-.nav-logo:hover .nav-logo-ring-outer { opacity: 1; }
-.nav-logo:hover .nav-logo-ring-inner { opacity: 1; }
-.nav-logo.logo-hovered .nav-logo-ring-outer { opacity: 1; }
-
-/* Pulse glow behind logo */
-.nav-logo-pulse {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(185,28,28,0.3) 0%, transparent 70%);
-  animation: logoPulse 3s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes logoPulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.15); }
-}
-
+/* Logo image — square logo shown fully (no circular crop) */
 .nav-logo-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 50%;
-  filter: drop-shadow(0 4px 16px rgba(185,28,28,0.5));
-  transition: filter 0.4s ease, transform 0.4s var(--ease-spring);
-  position: relative;
-  z-index: 1;
+  padding: 7px;
+  display: block;
+  transition: transform 0.5s var(--ease-out-expo);
 }
 .nav-logo:hover .nav-logo-img {
-  filter: drop-shadow(0 6px 28px rgba(251,191,36,0.7));
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 .nav-logo-text {
   display: flex;
@@ -908,11 +878,13 @@
   padding: 8px 14px;
 }
 .hero-chip-logo {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   object-fit: cover;
+  background: #fff;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 .hero-chip-icon { font-size: 1.3rem; }
 .hero-chip-text {

@@ -84,11 +84,6 @@ export default function Navbar({ activeSection = 'home' }) {
             onMouseLeave={() => setLogoHovered(false)}
           >
             <div className="nav-logo-img-wrap">
-              {/* Rotating glow ring */}
-              <div className="nav-logo-ring nav-logo-ring-outer" aria-hidden="true" />
-              <div className="nav-logo-ring nav-logo-ring-inner" aria-hidden="true" />
-              {/* Pulse glow */}
-              <div className="nav-logo-pulse" aria-hidden="true" />
               <img
                 src={imgs.logo}
                 alt="Hussaini Homes Foundation Logo"
