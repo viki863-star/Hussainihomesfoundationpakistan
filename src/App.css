@@ -89,7 +89,7 @@
   width: 60px;
   height: 60px;
   flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: 14px;
   overflow: hidden;
   background: #ffffff;
   box-shadow:
@@ -104,12 +104,12 @@
   transform: translateY(-1px);
 }
 
-/* Logo image — square logo shown fully (no circular crop) */
+/* Logo image — fills the whole badge (no cropping, no shrunk letterbox) */
 .nav-logo-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  padding: 6px;
+  object-fit: cover;
+  padding: 0;
   display: block;
   transition: transform 0.5s var(--ease-out-expo);
 }
@@ -908,7 +908,7 @@
 .hero-chip-logo {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius: 8px;
   object-fit: cover;
   background: #fff;
   flex-shrink: 0;
@@ -2551,7 +2551,7 @@
 .footer-logo {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
 }
