@@ -44,7 +44,7 @@ export default function Footer() {
             </h3>
             <p>{f.desc}</p>
             <div className="footer-social">
-              <a href="#" aria-label="Facebook">📘</a>
+              <a href="https://www.facebook.com/Hussainihome" target="_blank" rel="noopener noreferrer" aria-label="Facebook">📘</a>
               <a href="https://wa.me/923034030009" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">💬</a>
               <a href="#" aria-label="YouTube">▶️</a>
               <a href="#" aria-label="Instagram">📸</a>
