@@ -247,7 +247,7 @@
 
 /* ═══ LANGUAGE PILL TOGGLE ═══ */
 .lang-toggle-pill {
-  display: none;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
@@ -338,9 +338,9 @@
   transform: scale(1.05) rotate(8deg);
 }
 
-/* Nav right controls (mobile) */
+/* Nav right controls (theme + lang toggles) */
 .nav-right-controls {
-  display: none;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   position: relative;
