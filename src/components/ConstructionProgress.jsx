@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLang } from '../LangContext';
 import { useSiteImages } from '../siteImages';
 
-function ConstructionLightbox({ src, alt, caption, onClose }) {
+function ConstructionLightbox({ src, alt, onClose }) {
   const [zoomed, setZoomed] = useState(false);
 
   useEffect(() => {
@@ -37,7 +37,6 @@ function ConstructionLightbox({ src, alt, caption, onClose }) {
           draggable={false}
           onClick={() => setZoomed(z => !z)}
         />
-        <div className="lightbox-caption">{caption}</div>
       </div>
 
       <button
@@ -78,7 +77,7 @@ export default function ConstructionProgress() {
   const { t, isUrdu } = useLang();
   const imgs = useSiteImages();
   const c = t.construction;
-  const [open, setOpen] = useState(null);
+  const [open, setOpen] = useState(false);
 
   return (
     <section className="section construction-section" id="construction-progress" dir={isUrdu ? 'rtl' : 'ltr'}>
@@ -92,65 +91,29 @@ export default function ConstructionProgress() {
         </div>
       </div>
 
-      <div className="construction-timeline-wrap">
-        <div className="construction-timeline section-scale-in">
-
-          <figure className="construction-stage construction-stage-begin">
-            <button
-              type="button"
-              className="construction-img-btn"
-              onClick={() => setOpen('begin')}
-              aria-label={`${c.imageBeginAlt} — ${c.zoomLabel}`}
-            >
-              <img className="construction-img" src={imgs.constructionBegin} alt={c.imageBeginAlt} loading="lazy" />
-              <span className="construction-stage-chip" aria-hidden="true">
-                <span className="construction-stage-chip-dot" />
-                {c.labelBegin}
-              </span>
-              <span className="construction-zoom-badge" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  <line x1="11" y1="8" x2="11" y2="14" />
-                  <line x1="8" y1="11" x2="14" y2="11" />
-                </svg>
-                <span>{c.zoomLabel}</span>
-              </span>
-            </button>
-          </figure>
-
-          <div className="construction-arrow" aria-hidden="true">
-            <svg viewBox="0 0 120 64" className="construction-arrow-svg">
-              <path className="construction-arrow-line" d="M8 52 C 32 6, 88 6, 104 20" />
-              <path className="construction-arrow-head" d="M88 14 L110 24 L88 36 Z" />
+      <div className="construction-poster-wrap section-scale-in">
+        <button
+          type="button"
+          className="construction-img-btn construction-poster-btn"
+          onClick={() => setOpen(true)}
+          aria-label={`${c.imageAlt} — ${c.zoomLabel}`}
+        >
+          <img
+            className="construction-img construction-poster"
+            src={imgs.constructionPoster}
+            alt={c.imageAlt}
+            loading="lazy"
+          />
+          <span className="construction-zoom-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <line x1="11" y1="8" x2="11" y2="14" />
+              <line x1="8" y1="11" x2="14" y2="11" />
             </svg>
-          </div>
-
-          <figure className="construction-stage construction-stage-today">
-            <button
-              type="button"
-              className="construction-img-btn"
-              onClick={() => setOpen('today')}
-              aria-label={`${c.imageTodayAlt} — ${c.zoomLabel}`}
-            >
-              <img className="construction-img" src={imgs.constructionToday} alt={c.imageTodayAlt} loading="lazy" />
-              <span className="construction-stage-chip" aria-hidden="true">
-                <span className="construction-stage-chip-dot" />
-                {c.labelToday}
-              </span>
-              <span className="construction-zoom-badge" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  <line x1="11" y1="8" x2="11" y2="14" />
-                  <line x1="8" y1="11" x2="14" y2="11" />
-                </svg>
-                <span>{c.zoomLabel}</span>
-              </span>
-            </button>
-          </figure>
-
-        </div>
+            <span>{c.zoomLabel}</span>
+          </span>
+        </button>
       </div>
 
       <div className="container">
@@ -174,10 +137,9 @@ export default function ConstructionProgress() {
 
       {open && (
         <ConstructionLightbox
-          src={open === 'begin' ? imgs.constructionBegin : imgs.constructionToday}
-          alt={open === 'begin' ? c.imageBeginAlt : c.imageTodayAlt}
-          caption={c.cardTitle}
-          onClose={() => setOpen(null)}
+          src={imgs.constructionPoster}
+          alt={c.imageAlt}
+          onClose={() => setOpen(false)}
         />
       )}
     </section>

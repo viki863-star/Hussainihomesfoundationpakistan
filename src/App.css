@@ -3152,6 +3152,47 @@
   left: 16px;
 }
 
+/* Construction journey poster (single premium visual) */
+.construction-poster-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.construction-poster-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.construction-poster-btn:focus-visible {
+  outline: 3px solid var(--crimson);
+  outline-offset: 3px;
+}
+.construction-poster {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transition: transform 1s var(--ease-out-expo);
+}
+.construction-poster-btn:hover .construction-poster {
+  transform: scale(1.025);
+}
+.construction-poster-btn:hover .construction-zoom-badge {
+  background: var(--crimson);
+  border-color: var(--crimson);
+}
+[dir="rtl"] .construction-poster-btn .construction-zoom-badge {
+  right: auto;
+  left: 16px;
+}
+
 /* Progress card */
 .construction-card {
   margin-top: 40px;

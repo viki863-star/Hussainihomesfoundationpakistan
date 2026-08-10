@@ -28,6 +28,7 @@ const IMAGE_SLOTS = [
   { key: 'aboutBuilding', label: 'About Section Building', hint: 'Main photo in the About section' },
   { key: 'constructionBegin', label: 'Construction — Beginning', hint: 'First photo in the Building section (starting stage)' },
   { key: 'constructionToday', label: 'Construction — Today', hint: 'Second photo in the Building section (current stage)' },
+  { key: 'constructionPoster', label: 'Construction Journey Poster', hint: 'Full-width premium poster in the Building section' },
   { key: 'logo', label: 'Logo', hint: 'Logo shown in navbar, footer & preloader' },
 ];
 

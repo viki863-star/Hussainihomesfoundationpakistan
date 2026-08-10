@@ -6,6 +6,7 @@ export const SITE_IMAGE_DEFAULTS = {
   aboutBuilding: withBase('/images/building-night.jpg'),
   constructionBegin: withBase('/images/construction-beginning.webp'),
   constructionToday: withBase('/images/construction-today.webp'),
+  constructionPoster: withBase('/images/construction-journey-poster.webp'),
   logo: withBase('/images/LOGO.png'),
 };
 
