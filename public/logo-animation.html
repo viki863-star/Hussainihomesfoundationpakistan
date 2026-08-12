@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hussaini Homes Foundation — Logo Animation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+    }
+
+    .scene {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #1a0000 0%, #0a0a0a 70%);
+    }
+
+    /* ── Particles ── */
+    .particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #FFC107;
+      border-radius: 50%;
+      opacity: 0;
+      animation: particleRise 3s ease-out infinite;
+    }
+    @keyframes particleRise {
+      0%   { opacity: 0; transform: translateY(0) scale(0); }
+      20%  { opacity: 1; transform: translateY(-40px) scale(1); }
+      100% { opacity: 0; transform: translateY(-200px) scale(0); }
+    }
+
+    /* ── Glow rings ── */
+    .glow-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(198, 40, 40, 0.3);
+      opacity: 0;
+      animation: ringPulse 2.5s ease-out infinite;
+    }
+    .glow-ring:nth-child(2) { animation-delay: 0.4s; }
+    .glow-ring:nth-child(3) { animation-delay: 0.8s; }
+    @keyframes ringPulse {
+      0%   { width: 100px; height: 100px; opacity: 0.8; border-color: rgba(198,40,40,0.6); }
+      100% { width: 500px; height: 500px; opacity: 0; border-color: rgba(255,193,7,0); }
+    }
+
+    /* ── Logo container ── */
+    .logo-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      animation: logoEntry 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+    @keyframes logoEntry {
+      0%   { opacity: 0; transform: scale(0.5) translateY(40px); filter: blur(20px); }
+      50%  { opacity: 1; filter: blur(0px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+    }
+
+    /* ── Logo image ── */
+    .logo-img {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: contain;
+      background: #ffffff;
+      box-shadow:
+        0 0 60px rgba(198, 40, 40, 0.5),
+        0 0 120px rgba(255, 193, 7, 0.3),
+        0 20px 60px rgba(0, 0, 0, 0.6);
+      animation: logoGlow 2s ease-in-out infinite alternate;
+      animation-delay: 2s;
+    }
+    @keyframes logoGlow {
+      0%   { box-shadow: 0 0 60px rgba(198,40,40,0.5), 0 0 120px rgba(255,193,7,0.3), 0 20px 60px rgba(0,0,0,0.6); }
+      100% { box-shadow: 0 0 80px rgba(198,40,40,0.7), 0 0 160px rgba(255,193,7,0.5), 0 20px 80px rgba(0,0,0,0.8); }
+    }
+
+    /* ── Brand text ── */
+    .brand-text {
+      text-align: center;
+      opacity: 0;
+      animation: textReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 1s;
+    }
+    @keyframes textReveal {
+      0%   { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-name {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 0%, #FFC107 50%, #EF5350 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      text-shadow: none;
+    }
+
+    .brand-sub {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #FFC107;
+      margin-top: 8px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    /* ── Tagline ── */
+    .tagline {
+      margin-top: 16px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: textReveal 1s ease forwards;
+      animation-delay: 1.6s;
+    }
+
+    /* ── Bottom line ── */
+    .bottom-line {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #C62828, #FFC107, transparent);
+      animation: lineGrow 1.5s ease-out forwards;
+      animation-delay: 2s;
+    }
+    @keyframes lineGrow {
+      0%   { width: 0; opacity: 0; }
+      100% { width: 300px; opacity: 1; }
+    }
+
+    /* ── Corner accents ── */
+    .corner {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border: 2px solid rgba(198, 40, 40, 0.3);
+      opacity: 0;
+      animation: cornerFade 1s ease forwards;
+      animation-delay: 2.2s;
+    }
+    .corner-tl { top: 40px; left: 40px; border-right: none; border-bottom: none; }
+    .corner-tr { top: 40px; right: 40px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 40px; left: 40px; border-right: none; border-top: none; }
+    .corner-br { bottom: 40px; right: 40px; border-left: none; border-top: none; }
+    @keyframes cornerFade {
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* ── Loop indicator ── */
+    .loop-hint {
+      position: absolute;
+      bottom: 30px;
+      right: 40px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: textReveal 1s ease forwards;
+      animation-delay: 3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Glow rings -->
+    <div class="glow-ring"></div>
+    <div class="glow-ring"></div>
+    <div class="glow-ring"></div>
+
+    <!-- Corner accents -->
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <!-- Logo -->
+    <div class="logo-container">
+      <img
+        src="/images/LOGO.png"
+        alt="Hussaini Homes Foundation"
+        class="logo-img"
+      />
+      <div class="brand-text">
+        <div class="brand-name">Hussaini Homes</div>
+        <div class="brand-sub">Foundation Pakistan</div>
+        <div class="tagline">Since 2018 — Orphan Care Center, Parachinar</div>
+      </div>
+    </div>
+
+    <!-- Bottom decorative line -->
+    <div class="bottom-line"></div>
+
+    <div class="loop-hint">LOOPING ANIMATION</div>
+  </div>
+
+  <script>
+    // Generate particles
+    const container = document.getElementById('particles');
+    const colors = ['#C62828', '#FFC107', '#EF5350', '#FF8F00', '#ffffff'];
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = `${30 + Math.random() * 40}%`;
+      p.style.top = `${40 + Math.random() * 30}%`;
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDelay = `${Math.random() * 3}s`;
+      p.style.animationDuration = `${2 + Math.random() * 2}s`;
+      p.style.width = p.style.height = `${2 + Math.random() * 3}px`;
+      container.appendChild(p);
+    }
+  </script>
+</body>
+</html>

@@ -25,7 +25,7 @@ export default function TeamDetail() {
     );
   }
 
-  const bio = t.teamDetail.bios[member.id];
+  const bio = (member && member.bio && String(member.bio).trim()) || t.teamDetail.bios[member.id];
 
   return (
     <div className="detail-page" dir={isUrdu ? 'rtl' : 'ltr'}>

@@ -626,7 +626,7 @@ function TeamEditor({ team, setTeam, busy, api, onSave }) {
       <div className="adm-toolbar">
         <div>
           <h2 className="adm-section-title">Team Members</h2>
-          <p className="adm-sub">Edit names, phone numbers, roles and photos — changes appear on the site after saving.</p>
+          <p className="adm-sub">Full access — add / delete / edit members, their names, phones, photos and personal messages (bios) in EN or UR.</p>
         </div>
         <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>{busy ? 'Saving…' : 'Save Team'}</button>
       </div>
@@ -653,6 +653,13 @@ function TeamEditor({ team, setTeam, busy, api, onSave }) {
               <select className="adm-input" value={o.roleKey} onChange={e => patchOfficial(i, { roleKey: e.target.value })}>
                 {ROLE_OPTIONS.map(r => <option key={r.key} value={r.key}>{r.label}</option>)}
               </select>
+              <textarea
+                className="adm-input adm-textarea"
+                placeholder={'Member message / bio (EN or UR). Empty line = new paragraph. Line starting with a quote like — "His example message" — becomes a highlight.'}
+                value={o.bio || ''}
+                onChange={e => patchOfficial(i, { bio: e.target.value })}
+                rows={5}
+              />
             </div>
             <div className="adm-member-actions">
               <button className="adm-icon-btn" title="Move up" disabled={i === 0} onClick={() => moveOfficial(i, -1)}>↑</button>
@@ -681,6 +688,13 @@ function TeamEditor({ team, setTeam, busy, api, onSave }) {
                 <div className="adm-member-fields">
                   <input className="adm-input" placeholder="Full name" value={m.name} onChange={e => patchMember(ci, mi, { name: e.target.value })} />
                   <input className="adm-input" placeholder="Phone" value={m.phone} onChange={e => patchMember(ci, mi, { phone: e.target.value })} />
+                  <textarea
+                    className="adm-input adm-textarea"
+                    placeholder={'Member message / bio (optional)'}
+                    value={m.bio || ''}
+                    onChange={e => patchMember(ci, mi, { bio: e.target.value })}
+                    rows={4}
+                  />
                 </div>
                 <button className="adm-icon-btn adm-icon-danger" title="Remove member" onClick={() => removeMember(ci, mi)}>✕</button>
               </div>

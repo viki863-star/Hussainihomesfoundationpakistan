@@ -4206,6 +4206,13 @@ html.iab .fab.open .fab-ripple {
   border: 1px solid rgba(255,255,255,0.06);
 }
 .adm-select-sm { min-width: 0; }
+.adm-textarea {
+  resize: vertical;
+  min-height: 84px;
+  line-height: 1.6;
+  font-family: var(--font-body);
+  white-space: pre-wrap;
+}
 @media (max-width: 640px) {
   .adm-content-grid { grid-template-columns: 1fr; }
   .adm-mobile-pay-row { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
