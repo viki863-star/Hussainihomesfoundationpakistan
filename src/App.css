@@ -187,10 +187,14 @@
 }
 
 @media (max-width: 400px) {
-  /* On very small phones hide logo text, show only image */
-  .nav-logo-text { display: none; }
-  .nav-logo-img-wrap { width: 36px; height: 36px; }
-  .navbar-inner { padding: 0 14px; }
+  /* Tiny phones — keep name but make it smaller */
+  .nav-logo-text { display: flex; }
+  .nav-logo-en { font-size: 0.78rem; }
+  .nav-logo-ur { font-size: 0.7rem; }
+  .nav-logo-img-wrap { width: 34px; height: 34px; }
+  .navbar-inner { padding: 0 12px; }
+  .nav-right-controls { gap: 4px; }
+  .lang-toggle-pill { padding: 4px 6px; }
 }
 
 /* Nav links */
@@ -3965,7 +3969,7 @@
    ============================================================ */
 .floating-donate {
   position: fixed;
-  bottom: 100px;
+  bottom: 32px;
   right: 24px;
   z-index: 900;
   display: flex;
@@ -4035,8 +4039,8 @@
   transform: translateX(0);
 }
 @media (max-width: 480px) {
-  .floating-donate { bottom: 80px; right: 16px; }
-  .floating-donate-inner { padding: 12px 16px; }
+  .floating-donate { bottom: 24px; right: 16px; }
+  .floating-donate-inner { padding: 12px 14px; }
 }
 
 /* ============================================================
