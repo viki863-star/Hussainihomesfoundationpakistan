@@ -76,29 +76,20 @@ function MarqueeTicker({ items }) {
   );
 }
 
-/* ---- Floating Donate Button — Premium Gold Pill ---- */
+/* ---- Floating Donate Button — Premium Gold/Crimson Pill ---- */
 function FloatingDonate({ label }) {
-  const { isUrdu } = useLang();
-  const donateHref = isUrdu
-    ? 'https://wa.me/923034030009?text=' + encodeURIComponent('السلام علیکم، میں حسینی ہومز فاؤنڈیشن کو عطیہ دینا چاہتا ہوں۔')
-    : 'https://wa.me/923034030009?text=' + encodeURIComponent('Assalamu Alaikum, I would like to donate to Hussaini Homes Foundation.');
   return (
-    <a href={donateHref} target="_blank" rel="noopener noreferrer" className="fd-btn" aria-label={label} id="floating-donate-btn">
+    <a href="#donate" className="floating-donate" aria-label={label} id="floating-donate-btn">
       {/* Glow pulse rings */}
-      <span className="fd-btn-ring fd-btn-ring-1" aria-hidden="true" />
-      <span className="fd-btn-ring fd-btn-ring-2" aria-hidden="true" />
+      <div className="floating-donate-rings" aria-hidden="true">
+        <span className="fd-ring fd-ring-1" />
+        <span className="fd-ring fd-ring-2" />
+        <span className="fd-ring fd-ring-3" />
+      </div>
       {/* Main pill */}
-      <span className="fd-btn-body">
-        {/* Shimmer sweep */}
-        <span className="fd-btn-shimmer" aria-hidden="true" />
-        {/* Heart SVG */}
-        <span className="fd-btn-heart" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-        </span>
-        {/* Text */}
-        <span className="fd-btn-text">{label}</span>
+      <span className="floating-donate-inner">
+        <span className="floating-donate-heart" aria-hidden="true">♥</span>
+        <span className="floating-donate-text">{label}</span>
       </span>
     </a>
   );

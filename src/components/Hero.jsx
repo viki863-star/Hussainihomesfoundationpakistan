@@ -115,12 +115,16 @@ export default function Hero() {
   const mousePos = useRef({ x: 0, y: 0 });
   const tilt = useRef({ x: 0, y: 0 });
   const raf = useRef(null);
+  const hovering = useRef(false);
   const [parallaxY, setParallaxY] = useState(0);
 
-  // 3D tilt on mouse move
+  // 3D tilt on mouse move — only applies the perspective transform while the
+  // pointer is actually over the hero, so idle frames don't force constant
+  // repaints (this caused jank/glitches in slower webviews like Facebook's).
   useEffect(() => {
     const section = sectionRef.current;
-    if (!section) return;
+    const visual = visualRef.current;
+    if (!section || !visual) return;
     const onMove = (e) => {
       const rect = section.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
@@ -130,16 +134,18 @@ export default function Hero() {
         y: (e.clientY - cy) / rect.height,
       };
     };
+    const onEnter = () => { hovering.current = true; };
+    const onLeave = () => { hovering.current = false; visual.style.transform = ''; };
     section.addEventListener('mousemove', onMove, { passive: true });
+    section.addEventListener('mouseenter', onEnter);
+    section.addEventListener('mouseleave', onLeave);
 
     const lerp = (a, b, t) => a + (b - a) * t;
     const tick = () => {
-      tilt.current.x = lerp(tilt.current.x, mousePos.current.x, 0.06);
-      tilt.current.y = lerp(tilt.current.y, mousePos.current.y, 0.06);
-      if (visualRef.current) {
-        const rotX = -tilt.current.y * 10;
-        const rotY = tilt.current.x * 10;
-        visualRef.current.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      if (hovering.current) {
+        tilt.current.x = lerp(tilt.current.x, mousePos.current.x, 0.06);
+        tilt.current.y = lerp(tilt.current.y, mousePos.current.y, 0.06);
+        visual.style.transform = `perspective(1000px) rotateX(${-tilt.current.y * 10}deg) rotateY(${tilt.current.x * 10}deg)`;
       }
       raf.current = requestAnimationFrame(tick);
     };
@@ -147,6 +153,8 @@ export default function Hero() {
 
     return () => {
       section.removeEventListener('mousemove', onMove);
+      section.removeEventListener('mouseenter', onEnter);
+      section.removeEventListener('mouseleave', onLeave);
       cancelAnimationFrame(raf.current);
     };
   }, []);

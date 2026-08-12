@@ -4093,3 +4093,23 @@
   .adm-content-grid { grid-template-columns: 1fr; }
   .adm-mobile-pay-row { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
 }
+
+/* ============================================================
+   REDUCED MOTION — calms heavy hero/ambient animations in
+   low-end webviews (e.g. Facebook in-app browser) to stop the
+   hero from glitching/jumping on load.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .hero-particle, .hero-blob, .hero-orbit-ring, .hero-orbit-dot,
+  .hero-ring, .hero-scroll-wheel, .hero-typewriter-cursor,
+  .floating-donate-heart {
+    animation: none !important;
+  }
+  .hero-line-inner, .hero-typewriter-wrap {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hero-visual-wrap { transform: none !important; }
+  .marquee-track { animation: none !important; }
+}
