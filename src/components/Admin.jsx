@@ -76,6 +76,19 @@ export default function Admin() {
   const [tab, setTab] = useState('gallery');
   const [site, setSite] = useState({ gallery: { items: [] }, images: {} });
   const [team, setTeam] = useState({ officials: [], committees: [] });
+  const [content, setContent] = useState({
+    stats: { children: 31, yearsActive: 7, foundedYear: 2018 },
+    donate: {
+      bank: { bankName: 'Bank Al Habib – Parachinar Branch', accountTitle: 'Hussaini Homes Foundation', iban: 'PK05BAHL2018007800509701' },
+      mobilePay: [
+        { label: 'JazzCash',  number: '0307 5905907', name: 'Sayed Ijaz' },
+        { label: 'EasyPaisa', number: '0303 4030009', name: 'Iftikhar' },
+        { label: 'JazzCash',  number: '0303 8189466', name: 'Talat Hussain' },
+      ],
+    },
+    contact: { whatsapp: '923034030009', phone: '+92 303 4030009', email: 'hussainihomesfoundation@gmail.com', address: 'Parachinar, Kurram, KPK, Pakistan' },
+    footer: { facebook: 'https://www.facebook.com/Hussainihome', whatsapp: 'https://wa.me/923034030009', youtube: '#', instagram: '#' },
+  });
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [editor, setEditor] = useState(null);
@@ -110,6 +123,17 @@ export default function Admin() {
     const data = await api('/api/admin/site');
     setSite({ gallery: data.gallery || { items: [] }, images: data.images || {} });
     setTeam(data.team || { officials: [], committees: [] });
+    if (data.content && typeof data.content === 'object') {
+      setContent(prev => ({ ...prev, ...data.content,
+        stats: { ...prev.stats, ...(data.content.stats || {}) },
+        donate: { ...prev.donate, ...(data.content.donate || {}),
+          bank: { ...prev.donate.bank, ...(data.content.donate?.bank || {}) },
+          mobilePay: data.content.donate?.mobilePay || prev.donate.mobilePay,
+        },
+        contact: { ...prev.contact, ...(data.content.contact || {}) },
+        footer: { ...prev.footer, ...(data.content.footer || {}) },
+      }));
+    }
   }, [api]);
 
   useEffect(() => {
@@ -160,10 +184,11 @@ export default function Admin() {
           <span className="adm-header-title">Photo Manager</span>
         </div>
         <nav className="adm-tabs">
-          <button className={`adm-tab${tab === 'gallery' ? ' active' : ''}`} onClick={() => setTab('gallery')}>Gallery</button>
-          <button className={`adm-tab${tab === 'team' ? ' active' : ''}`} onClick={() => setTab('team')}>Team</button>
-          <button className={`adm-tab${tab === 'photos' ? ' active' : ''}`} onClick={() => setTab('photos')}>Photos</button>
-          <button className={`adm-tab${tab === 'settings' ? ' active' : ''}`} onClick={() => setTab('settings')}>Settings</button>
+          <button className={`adm-tab${tab === 'gallery' ? ' active' : ''}`} onClick={() => setTab('gallery')}>📷 Gallery</button>
+          <button className={`adm-tab${tab === 'team' ? ' active' : ''}`} onClick={() => setTab('team')}>👥 Team</button>
+          <button className={`adm-tab${tab === 'photos' ? ' active' : ''}`} onClick={() => setTab('photos')}>🖼️ Photos</button>
+          <button className={`adm-tab${tab === 'content' ? ' active' : ''}`} onClick={() => setTab('content')}>✏️ Content</button>
+          <button className={`adm-tab${tab === 'settings' ? ' active' : ''}`} onClick={() => setTab('settings')}>⚙️ Settings</button>
         </nav>
         <div className="adm-header-right">
           <a href="/" className="adm-btn adm-btn-ghost">← Website</a>
@@ -286,31 +311,17 @@ export default function Admin() {
           />
         )}
 
+        {tab === 'content' && (
+          <ContentEditor content={content} setContent={setContent} busy={busy} onSave={saveContent} />
+        )}
+
         {tab === 'settings' && (
           <div className="adm-settings">
             <h2 className="adm-section-title">Change Admin Password</h2>
             <form onSubmit={changePassword} className="adm-settings-form">
-              <input
-                type="password"
-                className="adm-input"
-                placeholder="Current password"
-                value={pw.current}
-                onChange={e => setPw(p => ({ ...p, current: e.target.value }))}
-              />
-              <input
-                type="password"
-                className="adm-input"
-                placeholder="New password (min 6 characters)"
-                value={pw.new}
-                onChange={e => setPw(p => ({ ...p, new: e.target.value }))}
-              />
-              <input
-                type="password"
-                className="adm-input"
-                placeholder="Repeat new password"
-                value={pw.confirm}
-                onChange={e => setPw(p => ({ ...p, confirm: e.target.value }))}
-              />
+              <input type="password" className="adm-input" placeholder="Current password" value={pw.current} onChange={e => setPw(p => ({ ...p, current: e.target.value }))} />
+              <input type="password" className="adm-input" placeholder="New password (min 6 characters)" value={pw.new} onChange={e => setPw(p => ({ ...p, new: e.target.value }))} />
+              <input type="password" className="adm-input" placeholder="Repeat new password" value={pw.confirm} onChange={e => setPw(p => ({ ...p, confirm: e.target.value }))} />
               <button className="adm-btn adm-btn-primary" disabled={busy}>Change Password</button>
             </form>
             <p className="adm-sub">Tip: pick a password the client can remember — they will use it to log in here.</p>
@@ -423,6 +434,15 @@ export default function Admin() {
       await api('/api/admin/images', { images }, 'POST');
       setSite(s => ({ ...s, images }));
       showMsg('ok', 'Photo replaced ✓');
+    } catch (err) { showMsg('err', err.message); }
+    setBusy(false);
+  }
+
+  async function saveContent() {
+    setBusy(true);
+    try {
+      await api('/api/admin/content', { content }, 'POST');
+      showMsg('ok', 'Content saved ✓ — refresh site to see changes');
     } catch (err) { showMsg('err', err.message); }
     setBusy(false);
   }
@@ -679,6 +699,195 @@ function TeamEditor({ team, setTeam, busy, api, onSave }) {
 
       <div className="adm-team-save">
         <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>{busy ? 'Saving…' : 'Save Team'}</button>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   CONTENT EDITOR — Full control over website text/data
+   ============================================================ */
+function ContentEditor({ content, setContent, busy, onSave }) {
+  const patch = (path, value) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const keys = path.split('.');
+      let obj = next;
+      for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
+      obj[keys[keys.length - 1]] = value;
+      return next;
+    });
+  };
+
+  const patchMobile = (i, field, value) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.donate.mobilePay[i][field] = value;
+      return next;
+    });
+  };
+
+  const addMobilePay = () => {
+    setContent(prev => ({
+      ...prev,
+      donate: {
+        ...prev.donate,
+        mobilePay: [...prev.donate.mobilePay, { label: 'JazzCash', number: '', name: '' }],
+      },
+    }));
+  };
+
+  const removeMobilePay = i => {
+    setContent(prev => ({
+      ...prev,
+      donate: {
+        ...prev.donate,
+        mobilePay: prev.donate.mobilePay.filter((_, idx) => idx !== i),
+      },
+    }));
+  };
+
+  return (
+    <div className="adm-content-editor">
+      <div className="adm-toolbar">
+        <div>
+          <h2 className="adm-section-title">✏️ Website Content Editor</h2>
+          <p className="adm-sub">Edit stats, bank details, phone numbers &amp; contact info. Changes appear on the website after saving.</p>
+        </div>
+        <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>
+          {busy ? 'Saving…' : '💾 Save All Changes'}
+        </button>
+      </div>
+
+      {/* ── STATS ── */}
+      <div className="adm-content-section">
+        <h3 className="adm-content-section-title">📊 Hero Stats</h3>
+        <div className="adm-content-grid">
+          <label className="adm-field">
+            <span>Number of Children 👧</span>
+            <input className="adm-input" type="number" min="1"
+              value={content.stats.children}
+              onChange={e => patch('stats.children', Number(e.target.value))} />
+          </label>
+          <label className="adm-field">
+            <span>Years Active ⏳</span>
+            <input className="adm-input" type="number" min="1"
+              value={content.stats.yearsActive}
+              onChange={e => patch('stats.yearsActive', Number(e.target.value))} />
+          </label>
+          <label className="adm-field">
+            <span>Founded Year 📅</span>
+            <input className="adm-input" type="number" min="2000"
+              value={content.stats.foundedYear}
+              onChange={e => patch('stats.foundedYear', Number(e.target.value))} />
+          </label>
+        </div>
+      </div>
+
+      {/* ── BANK DETAILS ── */}
+      <div className="adm-content-section">
+        <h3 className="adm-content-section-title">🏦 Bank Details (Donate Section)</h3>
+        <div className="adm-content-grid">
+          <label className="adm-field">
+            <span>Bank Name</span>
+            <input className="adm-input" value={content.donate.bank.bankName}
+              onChange={e => patch('donate.bank.bankName', e.target.value)} />
+          </label>
+          <label className="adm-field">
+            <span>Account Title</span>
+            <input className="adm-input" value={content.donate.bank.accountTitle}
+              onChange={e => patch('donate.bank.accountTitle', e.target.value)} />
+          </label>
+          <label className="adm-field" style={{ gridColumn: '1/-1' }}>
+            <span>IBAN Number</span>
+            <input className="adm-input adm-input-mono" value={content.donate.bank.iban}
+              onChange={e => patch('donate.bank.iban', e.target.value)} />
+          </label>
+        </div>
+      </div>
+
+      {/* ── MOBILE PAY ── */}
+      <div className="adm-content-section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 className="adm-content-section-title" style={{ marginBottom: 0 }}>📱 Mobile Pay Numbers</h3>
+          <button className="adm-btn adm-btn-outline" onClick={addMobilePay}>+ Add Number</button>
+        </div>
+        {content.donate.mobilePay.map((entry, i) => (
+          <div className="adm-mobile-pay-row" key={i}>
+            <select className="adm-input adm-select-sm" value={entry.label}
+              onChange={e => patchMobile(i, 'label', e.target.value)}>
+              <option>JazzCash</option>
+              <option>EasyPaisa</option>
+              <option>Bank Transfer</option>
+              <option>Other</option>
+            </select>
+            <input className="adm-input" placeholder="Name (e.g. Sayed Ijaz)" value={entry.name}
+              onChange={e => patchMobile(i, 'name', e.target.value)} />
+            <input className="adm-input adm-input-mono" placeholder="Number e.g. 0307 5905907" value={entry.number}
+              onChange={e => patchMobile(i, 'number', e.target.value)} />
+            <button className="adm-icon-btn adm-icon-danger" title="Remove" onClick={() => removeMobilePay(i)}>✕</button>
+          </div>
+        ))}
+      </div>
+
+      {/* ── CONTACT INFO ── */}
+      <div className="adm-content-section">
+        <h3 className="adm-content-section-title">📞 Contact Information</h3>
+        <div className="adm-content-grid">
+          <label className="adm-field">
+            <span>WhatsApp Number (with country code, no +)</span>
+            <input className="adm-input adm-input-mono" value={content.contact.whatsapp}
+              onChange={e => patch('contact.whatsapp', e.target.value)} />
+          </label>
+          <label className="adm-field">
+            <span>Display Phone Number</span>
+            <input className="adm-input" value={content.contact.phone}
+              onChange={e => patch('contact.phone', e.target.value)} />
+          </label>
+          <label className="adm-field">
+            <span>Email Address</span>
+            <input className="adm-input" type="email" value={content.contact.email}
+              onChange={e => patch('contact.email', e.target.value)} />
+          </label>
+          <label className="adm-field">
+            <span>Physical Address</span>
+            <input className="adm-input" value={content.contact.address}
+              onChange={e => patch('contact.address', e.target.value)} />
+          </label>
+        </div>
+      </div>
+
+      {/* ── SOCIAL LINKS ── */}
+      <div className="adm-content-section">
+        <h3 className="adm-content-section-title">🔗 Social Media Links</h3>
+        <div className="adm-content-grid">
+          <label className="adm-field">
+            <span>📘 Facebook URL</span>
+            <input className="adm-input" value={content.footer.facebook}
+              onChange={e => patch('footer.facebook', e.target.value)} />
+          </label>
+          <label className="adm-field">
+            <span>💬 WhatsApp URL</span>
+            <input className="adm-input" value={content.footer.whatsapp}
+              onChange={e => patch('footer.whatsapp', e.target.value)} />
+          </label>
+          <label className="adm-field">
+            <span>▶️ YouTube URL</span>
+            <input className="adm-input" value={content.footer.youtube}
+              onChange={e => patch('footer.youtube', e.target.value)} />
+          </label>
+          <label className="adm-field">
+            <span>📸 Instagram URL</span>
+            <input className="adm-input" value={content.footer.instagram}
+              onChange={e => patch('footer.instagram', e.target.value)} />
+          </label>
+        </div>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: 16 }}>
+        <button className="adm-btn adm-btn-primary" style={{ padding: '14px 48px', fontSize: '1rem' }} disabled={busy} onClick={onSave}>
+          {busy ? 'Saving…' : '💾 Save All Changes'}
+        </button>
       </div>
     </div>
   );

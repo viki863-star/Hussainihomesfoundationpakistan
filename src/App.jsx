@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { LangProvider } from './LangContext';
+import { fetchContent } from './useContent';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -78,9 +79,16 @@ function MarqueeTicker({ items }) {
 /* ---- Floating Donate ---- */
 function FloatingDonate({ label }) {
   return (
-    <a href="#donate" className="floating-donate" aria-label={label}>
-      ♥
-      <span className="tooltip">{label}</span>
+    <a href="#donate" className="floating-donate" aria-label={label} id="floating-donate-btn">
+      <div className="floating-donate-rings" aria-hidden="true">
+        <div className="fd-ring fd-ring-1" />
+        <div className="fd-ring fd-ring-2" />
+        <div className="fd-ring fd-ring-3" />
+      </div>
+      <div className="floating-donate-inner">
+        <span className="floating-donate-heart">♥</span>
+        <span className="floating-donate-text">{label}</span>
+      </div>
     </a>
   );
 }
@@ -129,6 +137,7 @@ function Preloader() {
   const imgs = useSiteImages();
 
   useEffect(() => {
+    fetchContent(); // pre-load editable content
     const t1 = setTimeout(() => setHidden(true), 1200);
     const t2 = setTimeout(() => setGone(true), 1900);
     return () => { clearTimeout(t1); clearTimeout(t2); };

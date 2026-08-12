@@ -1,0 +1,31 @@
+{
+  "stats": {
+    "children": 31,
+    "yearsActive": 7,
+    "foundedYear": 2018
+  },
+  "donate": {
+    "bank": {
+      "bankName": "Bank Al Habib – Parachinar Branch",
+      "accountTitle": "Hussaini Homes Foundation",
+      "iban": "PK05BAHL2018007800509701"
+    },
+    "mobilePay": [
+      { "label": "JazzCash", "number": "0307 5905907", "name": "Sayed Ijaz" },
+      { "label": "EasyPaisa", "number": "0303 4030009", "name": "Iftikhar" },
+      { "label": "JazzCash", "number": "0303 8189466", "name": "Talat Hussain" }
+    ]
+  },
+  "contact": {
+    "whatsapp": "923034030009",
+    "phone": "+92 303 4030009",
+    "email": "hussainihomesfoundation@gmail.com",
+    "address": "Parachinar, Kurram, KPK, Pakistan"
+  },
+  "footer": {
+    "facebook": "https://www.facebook.com/Hussainihome",
+    "whatsapp": "https://wa.me/923034030009",
+    "youtube": "#",
+    "instagram": "#"
+  }
+}

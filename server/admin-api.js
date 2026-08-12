@@ -171,7 +171,17 @@ export async function handleApi(req, res) {
         gallery: readJSON(path.join(DATA_DIR, 'gallery.json'), { items: [] }),
         images: readJSON(path.join(DATA_DIR, 'site-images.json'), {}),
         team: readJSON(path.join(DATA_DIR, 'team.json'), { officials: [], committees: [] }),
+        content: readJSON(path.join(DATA_DIR, 'content.json'), {}),
       });
+    }
+
+    if (p === '/api/admin/content' && req.method === 'POST') {
+      const body = await readBody(req);
+      const content = body.content && typeof body.content === 'object' ? body.content : {};
+      writeJSON(path.join(DATA_DIR, 'content.json'), content);
+      mirrorToDist('data/content.json');
+      await gitPutFile('data/content.json');
+      return sendJSON(res, 200, { ok: true });
     }
 
     if (p === '/api/admin/gallery' && req.method === 'POST') {
