@@ -614,3 +614,10 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
 @media (max-width: 768px) {
   .back-to-top { left: 16px; bottom: 16px; }
 }
+
+/* RTL / Urdu — mirror back-to-top to the RIGHT so it never
+   overlaps the floating FABs (which sit on the left in RTL) */
+[dir="rtl"] .back-to-top { left: auto; right: 32px; bottom: 32px; }
+@media (max-width: 768px) {
+  [dir="rtl"] .back-to-top { right: 16px; bottom: 16px; }
+}
