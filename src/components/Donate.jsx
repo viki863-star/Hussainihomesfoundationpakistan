@@ -143,9 +143,17 @@ export default function Donate() {
           </div>
         </div>
 
-        {/* Unique Donate CTA */}
+        {/* Unique Donate CTA — opens WhatsApp with a ready message */}
         <div className="donate-cta-wrap reveal reveal-up">
-          <a href="#donate" className="donate-mega-btn" id="donate-mega-btn">
+          <a
+            href={isUrdu
+              ? 'https://wa.me/923034030009?text=' + encodeURIComponent('السلام علیکم، میں حسینی ہومز فاؤنڈیشن کو عطیہ دینا چاہتا ہوں۔')
+              : 'https://wa.me/923034030009?text=' + encodeURIComponent('Assalamu Alaikum, I would like to donate to Hussaini Homes Foundation.')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="donate-mega-btn"
+            id="donate-mega-btn"
+          >
             <div className="donate-mega-btn-rings" aria-hidden="true">
               <div className="donate-ring donate-ring-1" />
               <div className="donate-ring donate-ring-2" />

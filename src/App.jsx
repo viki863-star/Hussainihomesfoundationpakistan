@@ -59,7 +59,7 @@ function CustomCursor() {
   );
 }
 
-/* ---- Marquee Ticker (uses lang via prop) ---- */
+/* ---- Marquee Ticker ---- */
 function MarqueeTicker({ items }) {
   const doubled = [...items, ...items];
   return (
@@ -76,19 +76,30 @@ function MarqueeTicker({ items }) {
   );
 }
 
-/* ---- Floating Donate ---- */
+/* ---- Floating Donate Button — Premium Gold Pill ---- */
 function FloatingDonate({ label }) {
+  const { isUrdu } = useLang();
+  const donateHref = isUrdu
+    ? 'https://wa.me/923034030009?text=' + encodeURIComponent('السلام علیکم، میں حسینی ہومز فاؤنڈیشن کو عطیہ دینا چاہتا ہوں۔')
+    : 'https://wa.me/923034030009?text=' + encodeURIComponent('Assalamu Alaikum, I would like to donate to Hussaini Homes Foundation.');
   return (
-    <a href="#donate" className="floating-donate" aria-label={label} id="floating-donate-btn">
-      <div className="floating-donate-rings" aria-hidden="true">
-        <div className="fd-ring fd-ring-1" />
-        <div className="fd-ring fd-ring-2" />
-        <div className="fd-ring fd-ring-3" />
-      </div>
-      <div className="floating-donate-inner">
-        <span className="floating-donate-heart">♥</span>
-        <span className="floating-donate-text">{label}</span>
-      </div>
+    <a href={donateHref} target="_blank" rel="noopener noreferrer" className="fd-btn" aria-label={label} id="floating-donate-btn">
+      {/* Glow pulse rings */}
+      <span className="fd-btn-ring fd-btn-ring-1" aria-hidden="true" />
+      <span className="fd-btn-ring fd-btn-ring-2" aria-hidden="true" />
+      {/* Main pill */}
+      <span className="fd-btn-body">
+        {/* Shimmer sweep */}
+        <span className="fd-btn-shimmer" aria-hidden="true" />
+        {/* Heart SVG */}
+        <span className="fd-btn-heart" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </span>
+        {/* Text */}
+        <span className="fd-btn-text">{label}</span>
+      </span>
     </a>
   );
 }
@@ -103,7 +114,7 @@ function FloatingWhatsApp() {
       className="floating-whatsapp"
       aria-label="Chat on WhatsApp"
     >
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="30" height="30">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="26" height="26">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
       </svg>
       <span className="tooltip">WhatsApp</span>
@@ -137,7 +148,7 @@ function Preloader() {
   const imgs = useSiteImages();
 
   useEffect(() => {
-    fetchContent(); // pre-load editable content
+    fetchContent();
     const t1 = setTimeout(() => setHidden(true), 1200);
     const t2 = setTimeout(() => setGone(true), 1900);
     return () => { clearTimeout(t1); clearTimeout(t2); };
@@ -152,10 +163,9 @@ function Preloader() {
   );
 }
 
-/* ---- Surprise Scroll Animations Setup ---- */
+/* ---- Scroll Animations ---- */
 function useScrollAnimations() {
   useEffect(() => {
-    // 1. Reveal observer
     const revealObs = new IntersectionObserver(
       entries => entries.forEach(e => {
         if (e.isIntersecting) {
@@ -166,26 +176,18 @@ function useScrollAnimations() {
       }),
       { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     );
-
-    // 2. Stagger observer
     const staggerObs = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
       { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
     );
-
-    // 3. Section title observer
     const titleObs = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
       { threshold: 0.5 }
     );
-
-    // 4. Counter observer (for surprise number pop)
     const counterObs = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('pop-in'); }),
       { threshold: 0.6 }
     );
-
-    // 5. Premium fade-in observers (section-level)
     const makeObs = (threshold, rootMargin) => new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
       { threshold, rootMargin }
@@ -199,11 +201,8 @@ function useScrollAnimations() {
     document.querySelectorAll('.section-fade-up, .section-fade-left, .section-fade-right, .section-scale-in').forEach(el => fadeObs.observe(el));
 
     return () => {
-      revealObs.disconnect();
-      staggerObs.disconnect();
-      titleObs.disconnect();
-      counterObs.disconnect();
-      fadeObs.disconnect();
+      revealObs.disconnect(); staggerObs.disconnect();
+      titleObs.disconnect(); counterObs.disconnect(); fadeObs.disconnect();
     };
   }, []);
 }
@@ -258,16 +257,11 @@ function HomePage() {
 }
 
 /* ---- App ---- */
-// The build bakes a subpath base (e.g. GitHub Pages), but Render serves the
-// same build from the site root. Only require the base in the URL when the
-// page actually sits under it, so one build works on both.
 function routerBasename() {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   return base && window.location.pathname.startsWith(base) ? base : '';
 }
 
-// The admin login page must stay out of search engines so Google never sees
-// a "password page" on a low-reputation (new) domain — a phishing heuristic.
 function RobotsMeta() {
   const { pathname } = useLocation();
   useEffect(() => {
