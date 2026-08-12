@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { LangProvider } from './LangContext';
 import { fetchContent } from './useContent';
@@ -206,22 +206,25 @@ function IntroOverlay({ onDone }) {
     }
     const t1 = setTimeout(() => setHiding(true), 4600);
     const t2 = setTimeout(() => setOff(true), 5300);
-    const skip = () => { sessionStorage.setItem('hh_intro', '1'); setHiding(true); setTimeout(() => setOff(true), 550); };
+    const skip = () => { setHiding(true); setTimeout(() => setOff(true), 550); };
     const onKey = (e) => { if (e.key === 'Escape') skip(); };
     window.addEventListener('keydown', onKey);
     return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener('keydown', onKey); };
   }, [onDone]);
 
   useEffect(() => {
-    if (off) {
-      sessionStorage.setItem('hh_intro', '1');
-      onDone();
-    }
+    if (!off) return;
+    sessionStorage.setItem('hh_intro', '1');
+    onDone();
   }, [off, onDone]);
 
   if (off) return null;
   return (
-    <div className={`intro-overlay${hiding ? ' intro-hide' : ''}`} onClick={() => { sessionStorage.setItem('hh_intro', '1'); setHiding(true); }} aria-hidden="true">
+    <div
+      className={`intro-overlay${hiding ? ' intro-hide' : ''}`}
+      onClick={() => { setHiding(true); setTimeout(() => setOff(true), 550); }}
+      aria-hidden="true"
+    >
       <iframe
         src={withBase('/logo-animation.html')}
         title="Hussaini Homes"
@@ -298,6 +301,7 @@ function HomePage() {
   const activeSection = useActiveSection();
   useScrollAnimations();
   const [introSeen, setIntroSeen] = useState(() => sessionStorage.getItem('hh_intro') === '1');
+  const finishIntro = useCallback(() => setIntroSeen(true), []);
 
   useEffect(() => {
     const ua = navigator.userAgent || '';
@@ -307,7 +311,7 @@ function HomePage() {
 
   return (
     <>
-      {!introSeen && <IntroOverlay onDone={() => setIntroSeen(true)} />}
+      {!introSeen && <IntroOverlay onDone={finishIntro} />}
       <Preloader hidden={!introSeen} />
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <CustomCursor />
