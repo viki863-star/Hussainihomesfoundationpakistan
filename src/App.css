@@ -2460,9 +2460,11 @@
   box-shadow: 0 0 0 1px rgba(185,28,28,0.3), 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(185,28,28,0.1);
 }
 
-/* Marquee pause on hover */
-.marquee-track:hover {
-  animation-play-state: paused;
+/* Marquee pause on hover (desktop only — touch devices keep it scrolling) */
+@media (hover: hover) {
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
 }
 
 /* ─── Urdu mode global tweaks ─── */
@@ -4225,7 +4227,6 @@ html.iab .fab.open .fab-ripple {
     transform: none !important;
   }
   .hero-visual-wrap { transform: none !important; }
-  .marquee-track { animation: none !important; }
 }
 
 /* ============================================================
@@ -4244,8 +4245,7 @@ html.iab .hero-image-border-inner {
   display: none !important;
 }
 html.iab .hero-line-inner,
-html.iab .hero-typewriter-wrap,
-html.iab .marquee-track {
+html.iab .hero-typewriter-wrap {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
