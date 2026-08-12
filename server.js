@@ -64,6 +64,27 @@ function serveStatic(req, res, urlPath) {
     // SPA fallback — only for extension-less routes
     if (!path.basename(rel).includes('.')) {
       const idx = path.join(DIST, 'index.html');
+
+      const isAdmin = rel === 'admin' || rel.startsWith('admin/');
+
+      // Admin login page must be noindex in the RAW html too (not only after
+      // React mounts) so search engines never index a password page here.
+      if (isAdmin) {
+        fs.readFile(idx, (e2, buf) => {
+          if (e2) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('Admin page not found.');
+            return;
+          }
+          const html = buf
+            .toString('utf8')
+            .replace(/name="robots"\s+content="index,\s*follow"/, 'name="robots" content="noindex, nofollow"');
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': Buffer.byteLength(html) });
+          res.end(html);
+        });
+        return;
+      }
+
       fs.stat(idx, (e2, st2) => {
         if (e2) {
           res.writeHead(404, { 'Content-Type': 'text/plain' });
