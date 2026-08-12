@@ -180,7 +180,7 @@ export default function Admin() {
 
       <header className="adm-header">
         <div className="adm-header-left">
-          <img src={withBase(site.images.logo) || withBase('/images/LOGO.png')} alt="logo" className="adm-header-logo" />
+          <img src={withBase(site.images.logo) || withBase('/images/ELOGO.png')} alt="logo" className="adm-header-logo" />
           <span className="adm-header-title">Photo Manager</span>
         </div>
         <nav className="adm-tabs">
