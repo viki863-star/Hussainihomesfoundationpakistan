@@ -15,6 +15,8 @@ export const translations = {
       donate: '♥ Donate',
       lang: 'اردو',
       loc: 'Parachinar · Pakistan',
+      whatsappSub: 'Chat with us',
+      donateSub: 'Support a child today',
     },
     // Hero
     hero: {
@@ -286,6 +288,8 @@ Together, let us build a future where no orphan feels alone and every child has 
       donate: '♥ عطیہ دیں',
       lang: 'English',
       loc: 'پاراچنار · پاکستان',
+      whatsappSub: 'ہمیں لکھیں',
+      donateSub: 'آج ایک بچے کی کفالت کریں',
     },
     // Hero
     hero: {

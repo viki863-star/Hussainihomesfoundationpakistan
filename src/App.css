@@ -3965,73 +3965,183 @@
 }
 
 /* ============================================================
-   FLOATING DONATE BUTTON — New Design
+   PREMIUM EXPANDING FABs — WhatsApp + Donate
+   Circle morphs/expands toward the LEFT into a rounded card.
+   GPU-friendly: only transform + opacity animate.
    ============================================================ */
-.floating-donate {
+.fabs {
   position: fixed;
-  bottom: 32px;
   right: 24px;
-  z-index: 900;
+  bottom: 32px;
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  pointer-events: none;
+}
+.fab {
+  --fab-w: 182px;
+  --fab-h: 52px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: var(--fab-h);
+  pointer-events: auto;
+}
+.fab-card {
+  display: flex;
+  align-items: center;
+  width: var(--fab-w);
+  height: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--white);
+  transform: scaleX(0);
+  transform-origin: right center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease,
+    visibility 0s linear 0.55s;
+}
+.fab.open .fab-card {
+  transform: scaleX(1);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease,
+    visibility 0s linear 0s;
+}
+.fab-whatsapp .fab-card {
+  background: linear-gradient(135deg, #31D46A, #25D366);
+  box-shadow: 0 12px 34px rgba(37,211,102,0.45);
+}
+.fab-donate .fab-card {
+  background: linear-gradient(135deg, var(--gold-glow), var(--gold));
+  box-shadow: 0 12px 34px rgba(217,119,6,0.45);
+}
+.fab-card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  padding: 0 22px 0 24px;
+  opacity: 0;
+  transform: translateX(12px);
+  transition: opacity 0.32s ease 0.2s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+.fab.open .fab-card-inner {
+  opacity: 1;
+  transform: translateX(0);
+}
+.fab-label {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+.fab-sub {
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  font-weight: 500;
+  opacity: 0.88;
+  line-height: 1.2;
+}
+.fab-icon {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: var(--fab-h);
+  height: var(--fab-h);
+  margin-left: -2px;
+  border: none;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
-  border-radius: 100px;
-  overflow: visible;
+  color: var(--white);
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
 }
-.floating-donate-rings {
-  position: absolute;
-  width: 56px;
-  height: 56px;
-  pointer-events: none;
+.fab-whatsapp .fab-icon {
+  background: linear-gradient(135deg, #31D46A, #25D366);
+  box-shadow: 0 6px 22px rgba(37,211,102,0.5);
 }
-.fd-ring {
+.fab-donate .fab-icon {
+  background: linear-gradient(135deg, var(--gold-glow), var(--gold));
+  box-shadow: 0 6px 22px rgba(217,119,6,0.45);
+}
+.fab-icon:hover { transform: scale(1.08); }
+.fab-icon:active { transform: scale(0.95); }
+.fab-icon svg { display: block; }
+.fab-icon-glyph {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.fab-donate.open .fab-icon-glyph {
+  animation: heartbeat 1.2s ease-in-out infinite;
+}
+@keyframes fabIconPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.fab.open .fab-icon { animation: fabIconPop 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.fab-ripple {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(185,28,28,0.45);
-  animation: fdRingPulse 2.5s ease-out infinite;
+  pointer-events: none;
+  background: rgba(255,255,255,0.4);
+  transform: scale(0.3);
+  opacity: 0;
 }
-.fd-ring-1 { animation-delay: 0s; }
-.fd-ring-2 { inset: -8px; animation-delay: 0.7s; }
-.fd-ring-3 { inset: -16px; animation-delay: 1.4s; }
-@keyframes fdRingPulse {
-  0%   { opacity: 0.9; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.6); }
+.fab.open .fab-ripple { animation: fabRipple 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes fabRipple {
+  0%   { transform: scale(0.3); opacity: 0.55; }
+  100% { transform: scale(2.6); opacity: 0; }
 }
-.floating-donate-inner {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  background: linear-gradient(135deg, var(--crimson), #9B1313);
-  border-radius: 100px;
-  padding: 14px 20px;
-  box-shadow: 0 8px 28px rgba(185,28,28,0.5);
-  transition: all 0.4s var(--ease-spring);
-  white-space: nowrap;
-}
-.floating-donate:hover .floating-donate-inner {
-  padding: 14px 24px;
-  box-shadow: 0 12px 36px rgba(185,28,28,0.6);
-}
-.floating-donate-heart {
-  font-size: 1.3rem;
-  animation: heartbeat 1.2s ease-in-out infinite;
-  flex-shrink: 0;
-  color: #fff;
-}
-.floating-donate-text {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #fff;
-  white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
+
 @media (max-width: 480px) {
-  .floating-donate { bottom: 24px; right: 16px; }
-  .floating-donate-inner { padding: 12px 14px; }
+  .fabs { right: 18px; bottom: 22px; gap: 12px; }
+  .fab { --fab-w: 156px; --fab-h: 46px; }
+  .fab-card-inner { padding: 0 14px 0 16px; }
+  .fab-label { font-size: 0.75rem; }
+  .fab-sub { font-size: 0.6rem; }
+  .fab-icon svg { width: 22px; height: 22px; }
+  .fab-icon-glyph { font-size: 1.2rem; }
+}
+
+/* Reduced motion — instant, still usable */
+@media (prefers-reduced-motion: reduce) {
+  .fab-card,
+  .fab-card-inner,
+  .fab-icon,
+  .fab-ripple {
+    transition: none !important;
+    animation: none !important;
+  }
+  .fab-card { transform: scaleX(1); }
+  .fab:not(.open) .fab-card { opacity: 0; visibility: hidden; }
+  .fab.open .fab-card { opacity: 1; visibility: visible; }
+  .fab-card-inner { transform: none; opacity: 0; }
+  .fab.open .fab-card-inner { opacity: 1; }
+  .fab-ripple { display: none; }
+}
+
+/* In-app browser (FB/IG/Messenger) — keep FAB usable, drop flair */
+html.iab .fab.open .fab-icon,
+html.iab .fab-donate.open .fab-icon-glyph,
+html.iab .fab.open .fab-ripple {
+  animation: none !important;
 }
 
 /* ============================================================
@@ -4092,8 +4202,7 @@
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .hero-particle, .hero-blob, .hero-orbit-ring, .hero-orbit-dot,
-  .hero-ring, .hero-scroll-wheel, .hero-typewriter-cursor,
-  .floating-donate-heart {
+  .hero-ring, .hero-scroll-wheel, .hero-typewriter-cursor {
     animation: none !important;
   }
   .hero-line-inner, .hero-typewriter-wrap {
