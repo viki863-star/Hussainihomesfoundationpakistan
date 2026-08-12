@@ -4022,8 +4022,8 @@
   box-shadow: 0 12px 34px rgba(37,211,102,0.45);
 }
 .fab-donate .fab-card {
-  background: linear-gradient(135deg, var(--gold-glow), var(--gold));
-  box-shadow: 0 12px 34px rgba(217,119,6,0.45);
+  background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+  box-shadow: 0 12px 34px rgba(185,28,28,0.45);
 }
 .fab-card-inner {
   display: flex;
@@ -4076,8 +4076,8 @@
   box-shadow: 0 6px 22px rgba(37,211,102,0.5);
 }
 .fab-donate .fab-icon {
-  background: linear-gradient(135deg, var(--gold-glow), var(--gold));
-  box-shadow: 0 6px 22px rgba(217,119,6,0.45);
+  background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+  box-shadow: 0 6px 22px rgba(185,28,28,0.5);
 }
 .fab-icon:hover { transform: scale(1.08); }
 .fab-icon:active { transform: scale(0.95); }
@@ -4085,6 +4085,10 @@
 .fab-icon-glyph {
   font-size: 1.35rem;
   line-height: 1;
+}
+.fab-donate .fab-icon-glyph {
+  color: var(--crimson-light);
+  text-shadow: 0 1px 3px rgba(255,255,255,0.35);
 }
 .fab-donate.open .fab-icon-glyph {
   animation: heartbeat 1.2s ease-in-out infinite;
