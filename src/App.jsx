@@ -220,6 +220,12 @@ function HomePage() {
   const activeSection = useActiveSection();
   useScrollAnimations();
 
+  useEffect(() => {
+    const ua = navigator.userAgent || '';
+    const isInAppBrowser = /FBAN|FBAV|FB_IAB|fb_iab|Instagram|Messenger|FB4A/i.test(ua);
+    if (isInAppBrowser) document.documentElement.classList.add('iab');
+  }, []);
+
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>

@@ -289,60 +289,8 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
 /* ============================================
-   FLOATING DONATE
+   FLOATING DONATE PULSE KEYFRAMES
    ============================================ */
-.floating-donate {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-glow), var(--gold));
-  color: var(--ink);
-  font-size: 1.6rem;
-  box-shadow: 0 4px 24px rgba(251,191,36,0.5), 0 0 0 0 rgba(251,191,36,0.4);
-  animation: floatPulse 2.5s ease-in-out infinite;
-  transition: var(--transition);
-  cursor: pointer;
-}
-.floating-donate:hover {
-  transform: scale(1.15);
-  box-shadow: 0 8px 40px rgba(251,191,36,0.7), 0 0 0 8px rgba(251,191,36,0.1);
-}
-.floating-donate::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
-  background-size: 250% 100%;
-  background-position: -250% 0;
-  animation: btnShimmer 3s ease infinite;
-  pointer-events: none;
-}
-.floating-donate .tooltip {
-  position: absolute;
-  right: 74px;
-  background: var(--ink);
-  color: var(--white);
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  box-shadow: var(--shadow);
-}
-.floating-donate:hover .tooltip { opacity: 1; }
-
 @keyframes floatPulse {
   0%, 100% { transform: scale(1); box-shadow: 0 4px 24px rgba(251,191,36,0.5), 0 0 0 0 rgba(251,191,36,0.4); }
   50%       { transform: scale(1.06); box-shadow: 0 8px 32px rgba(251,191,36,0.6), 0 0 0 12px rgba(251,191,36,0); }
@@ -571,7 +519,6 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
   .section-title { font-size: 2rem; }
   .section-subtitle { margin-bottom: 40px; font-size: 0.97rem; }
   .btn-lg { padding: 16px 36px; font-size: 0.98rem; }
-  .floating-donate { width: 56px; height: 56px; font-size: 1.4rem; bottom: 20px; right: 20px; }
   .cursor-glow, .cursor-ring { display: none; }
 }
 

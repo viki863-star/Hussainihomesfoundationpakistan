@@ -4004,19 +4004,16 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   background: linear-gradient(135deg, var(--crimson), #9B1313);
   border-radius: 100px;
-  padding: 14px 18px;
+  padding: 14px 20px;
   box-shadow: 0 8px 28px rgba(185,28,28,0.5);
   transition: all 0.4s var(--ease-spring);
   white-space: nowrap;
-  overflow: hidden;
-  max-width: 52px;
 }
 .floating-donate:hover .floating-donate-inner {
-  padding: 14px 22px;
-  max-width: 200px;
+  padding: 14px 24px;
   box-shadow: 0 12px 36px rgba(185,28,28,0.6);
 }
 .floating-donate-heart {
@@ -4029,14 +4026,8 @@
   font-size: 0.85rem;
   font-weight: 700;
   color: #fff;
-  opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
   white-space: nowrap;
-}
-.floating-donate:hover .floating-donate-text {
-  opacity: 1;
-  transform: translateX(0);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 @media (max-width: 480px) {
   .floating-donate { bottom: 24px; right: 16px; }
@@ -4112,4 +4103,38 @@
   }
   .hero-visual-wrap { transform: none !important; }
   .marquee-track { animation: none !important; }
+}
+
+/* ============================================================
+   IN-APP BROWSER (Facebook/Instagram/Messenger webview) —
+   these webviews repaint heavily and glitch on load, so we
+   switch off the heavy ambient layers there entirely.
+   ============================================================ */
+html.iab .hero-particles,
+html.iab .hero-blob,
+html.iab .hero-orbit,
+html.iab .hero-ring,
+html.iab .noise-overlay,
+html.iab .hero-image-border::before,
+html.iab .hero-image-border::after,
+html.iab .hero-image-border-inner {
+  display: none !important;
+}
+html.iab .hero-line-inner,
+html.iab .hero-typewriter-wrap,
+html.iab .marquee-track {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+html.iab .hero-visual-wrap {
+  transform: none !important;
+  animation: none !important;
+}
+html.iab .preloader {
+  display: none !important;
+}
+html.iab .cursor-glow,
+html.iab .cursor-ring {
+  display: none !important;
 }
