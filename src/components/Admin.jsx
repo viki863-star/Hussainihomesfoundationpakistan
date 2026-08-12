@@ -151,7 +151,7 @@ export default function Admin() {
     return (
       <div className="adm-page">
         <div className="adm-login">
-          <img src={withBase('/images/LOGO.png')} alt="Hussaini Homes logo" className="adm-login-logo" />
+          <img src={withBase('/images/ELOGO.png')} alt="Hussaini Homes logo" className="adm-login-logo" />
           <h1 className="adm-login-title">Hussaini Homes — Admin</h1>
           <p className="adm-login-sub">Enter the admin password to manage photos</p>
           <form onSubmit={handleLogin}>
