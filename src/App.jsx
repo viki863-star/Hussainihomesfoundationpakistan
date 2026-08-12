@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { LangProvider } from './LangContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -257,10 +257,28 @@ function routerBasename() {
   return base && window.location.pathname.startsWith(base) ? base : '';
 }
 
+// The admin login page must stay out of search engines so Google never sees
+// a "password page" on a low-reputation (new) domain — a phishing heuristic.
+function RobotsMeta() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const isAdmin = pathname.startsWith('/admin');
+    let meta = document.querySelector('meta[name="robots"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'robots');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', isAdmin ? 'noindex, nofollow' : 'index, follow');
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   return (
     <LangProvider>
       <BrowserRouter basename={routerBasename()}>
+        <RobotsMeta />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/team/:id" element={<TeamDetail />} />
