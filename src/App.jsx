@@ -17,6 +17,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Admin from './components/Admin';
 import { useSiteImages } from './siteImages';
+import { withBase } from './paths';
 import './App.css';
 import './admin.css';
 
@@ -168,23 +169,65 @@ function BackToTop() {
 }
 
 /* ---- Branded preloader ---- */
-function Preloader() {
-  const [hidden, setHidden] = useState(false);
+function Preloader({ hidden }) {
+  const [hide, setHide] = useState(false);
   const [gone, setGone] = useState(false);
   const imgs = useSiteImages();
 
   useEffect(() => {
     fetchContent();
-    const t1 = setTimeout(() => setHidden(true), 1200);
+    const t1 = setTimeout(() => setHide(true), 1200);
     const t2 = setTimeout(() => setGone(true), 1900);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
-  if (gone) return null;
+  if (gone || hidden) return null;
   return (
-    <div className={`preloader${hidden ? ' preloader-hidden' : ''}`} aria-hidden="true">
+    <div className={`preloader${hide ? ' preloader-hidden' : ''}`} aria-hidden="true">
       <img src={imgs.logo} alt="" className="preloader-logo" />
       <div className="preloader-bar"><div className="preloader-bar-fill" /></div>
+    </div>
+  );
+}
+
+/* ---- Logo intro (one shot per session) ---- */
+function IntroOverlay({ onDone }) {
+  const [hiding, setHiding] = useState(false);
+  const [off, setOff] = useState(false);
+
+  useEffect(() => {
+    const ua = navigator.userAgent || '';
+    const inApp = /FBAN|FBAV|FB_IAB|fb_iab|Instagram|Messenger|FB4A/i.test(ua);
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (inApp || reduced) {
+      sessionStorage.setItem('hh_intro', '1');
+      onDone();
+      return;
+    }
+    const t1 = setTimeout(() => setHiding(true), 4600);
+    const t2 = setTimeout(() => setOff(true), 5300);
+    const skip = () => { sessionStorage.setItem('hh_intro', '1'); setHiding(true); setTimeout(() => setOff(true), 550); };
+    const onKey = (e) => { if (e.key === 'Escape') skip(); };
+    window.addEventListener('keydown', onKey);
+    return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener('keydown', onKey); };
+  }, [onDone]);
+
+  useEffect(() => {
+    if (off) {
+      sessionStorage.setItem('hh_intro', '1');
+      onDone();
+    }
+  }, [off, onDone]);
+
+  if (off) return null;
+  return (
+    <div className={`intro-overlay${hiding ? ' intro-hide' : ''}`} onClick={() => { sessionStorage.setItem('hh_intro', '1'); setHiding(true); }} aria-hidden="true">
+      <iframe
+        src={withBase('/logo-animation.html')}
+        title="Hussaini Homes"
+        loading="eager"
+        tabIndex={-1}
+      />
     </div>
   );
 }
@@ -254,6 +297,7 @@ function HomePage() {
   const { t } = useLang();
   const activeSection = useActiveSection();
   useScrollAnimations();
+  const [introSeen, setIntroSeen] = useState(() => sessionStorage.getItem('hh_intro') === '1');
 
   useEffect(() => {
     const ua = navigator.userAgent || '';
@@ -263,8 +307,9 @@ function HomePage() {
 
   return (
     <>
+      {!introSeen && <IntroOverlay onDone={() => setIntroSeen(true)} />}
+      <Preloader hidden={!introSeen} />
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <Preloader />
       <CustomCursor />
       <Navbar activeSection={activeSection} />
       <div id="main-content">

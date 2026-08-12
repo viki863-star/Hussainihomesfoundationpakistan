@@ -585,6 +585,28 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
   object-fit: cover;
   animation: preloaderPulse 1.2s ease-in-in infinite;
 }
+
+/* ============================================
+   LOGO INTRO OVERLAY (one-shot brand intro)
+   ============================================ */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: #0a0a0a;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.intro-overlay iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.intro-overlay.intro-hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 .preloader-bar {
   width: 160px;
   height: 4px;
