@@ -118,6 +118,12 @@ To re-theme: change these variables, then grep `src/App.css` for hard-coded colo
 - Owner is expected to change it via **Settings tab**. Warn them if it is still default.
 - Admin features: add/edit/delete gallery photos, reorder, replace the 6 site image
   slots, manage team members & committees, upload images, change password.
+- **Persistence:** Render free-tier filesystems are ephemeral (wiped on every
+  redeploy/spin-down). To prevent admin uploads/saves from disappearing, the admin
+  API writes every change back to the GitHub repo via the Contents API. This needs a
+  GitHub token in the env var **`REPO_TOKEN`** (fine-grained PAT, `Contents:
+  Read and write`, restricted to this repo) set on Render. Without it, admin saves
+  only live until the next redeploy.
 
 ## 9. Deploying changes (the flow an AI must follow)
 

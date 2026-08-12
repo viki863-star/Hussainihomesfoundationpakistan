@@ -14,6 +14,61 @@ const ALLOWED_FOLDERS = new Set(['gallery', 'site-images', 'team']);
 const ALLOWED_EXT = new Set(['jpg', 'jpeg', 'png', 'jfif', 'webp', 'gif']);
 const MAX_BODY = 40 * 1024 * 1024;
 
+// Admin changes are committed back to the GitHub repo so they survive Render's
+// ephemeral filesystem (free-tier instances lose local files on every
+// redeploy/spin-down). Requires REPO_TOKEN env var set on the host.
+const REPO_OWNER = 'viki863-star';
+const REPO_NAME = 'Hussainihomesfoundationpakistan';
+const REPO_BRANCH = 'main';
+
+async function githubFetch(apiPath, options = {}) {
+  const token = process.env.REPO_TOKEN;
+  if (!token) return null;
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${apiPath}`,
+      {
+        ...options,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'User-Agent': 'hussaini-homes-admin',
+          ...(options.headers || {}),
+        },
+      }
+    );
+    if (res.status === 401 || res.status === 403 || res.status === 404) return null;
+    const data = await res.json().catch(() => ({}));
+    return { status: res.status, data };
+  } catch {
+    return null;
+  }
+}
+
+async function gitPutFile(relPath) {
+  const local = path.join(ROOT, relPath);
+  if (!fs.existsSync(local)) return;
+  const apiPath = 'public/' + relPath.split(path.sep).join('/');
+  let sha = null;
+  const existing = await githubFetch(apiPath, { method: 'GET' });
+  if (existing && existing.status === 200 && existing.data.sha) sha = existing.data.sha;
+  const body = { message: `admin: update ${relPath}`, content: fs.readFileSync(local).toString('base64'), branch: REPO_BRANCH };
+  if (sha) body.sha = sha;
+  await githubFetch(apiPath, { method: 'PUT', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } });
+}
+
+async function gitDeleteFile(relPath) {
+  const apiPath = 'public/' + relPath.split(path.sep).join('/');
+  const existing = await githubFetch(apiPath, { method: 'GET' });
+  if (!existing || existing.status !== 200 || !existing.data.sha) return;
+  await githubFetch(apiPath, {
+    method: 'DELETE',
+    body: JSON.stringify({ message: `admin: delete ${relPath}`, sha: existing.data.sha, branch: REPO_BRANCH }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 const tokens = new Set();
 
 function getConfig() {
@@ -124,6 +179,7 @@ export async function handleApi(req, res) {
       const items = Array.isArray(body.items) ? body.items : [];
       writeJSON(path.join(DATA_DIR, 'gallery.json'), { items });
       mirrorToDist('data/gallery.json');
+      await gitPutFile('data/gallery.json');
       return sendJSON(res, 200, { ok: true });
     }
 
@@ -132,6 +188,7 @@ export async function handleApi(req, res) {
       const images = body.images && typeof body.images === 'object' ? body.images : {};
       writeJSON(path.join(DATA_DIR, 'site-images.json'), images);
       mirrorToDist('data/site-images.json');
+      await gitPutFile('data/site-images.json');
       return sendJSON(res, 200, { ok: true });
     }
 
@@ -141,6 +198,7 @@ export async function handleApi(req, res) {
       const committees = Array.isArray(body.committees) ? body.committees : [];
       writeJSON(path.join(DATA_DIR, 'team.json'), { officials, committees });
       mirrorToDist('data/team.json');
+      await gitPutFile('data/team.json');
       return sendJSON(res, 200, { ok: true });
     }
 
@@ -162,6 +220,7 @@ export async function handleApi(req, res) {
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.writeFileSync(target, buf);
       mirrorToDist(rel);
+      await gitPutFile(rel);
       return sendJSON(res, 200, { ok: true, src: '/' + rel.split(path.sep).join('/') });
     }
 
@@ -175,6 +234,7 @@ export async function handleApi(req, res) {
       const target = safeJoin(PUBLIC, rel);
       if (fs.existsSync(target)) fs.unlinkSync(target);
       try { const d = path.join(DIST, rel); if (fs.existsSync(d)) fs.unlinkSync(d); } catch { /* ignore */ }
+      await gitDeleteFile(rel);
       return sendJSON(res, 200, { ok: true });
     }
 
