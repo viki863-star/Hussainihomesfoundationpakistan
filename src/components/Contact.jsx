@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { useLang } from '../LangContext';
 
 const WHATSAPP_NUMBER = '923034030009';
-const EMAIL = 'hussainihomes@gmail.com';
 
 export default function Contact() {
   const { t, isUrdu } = useLang();
   const c = t.contact;
   const [sent, setSent] = useState(false);
-  const [mailtoUrl, setMailtoUrl] = useState('');
+  const [waUrl, setWaUrl] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,11 +20,9 @@ export default function Contact() {
       `${c.message}: ${data.get('message')}`,
     ].join('\n');
 
-    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(body)}`;
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
-    setMailtoUrl(
-      `mailto:${EMAIL}?subject=${encodeURIComponent(data.get('subject'))}&body=${encodeURIComponent(body)}`
-    );
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(body)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setWaUrl(url);
     setSent(true);
   };
 
@@ -98,11 +95,11 @@ export default function Contact() {
                     {c.sent}
                   </div>
                   <a
-                    href={mailtoUrl}
+                    href={waUrl}
                     className="btn btn-outline"
                     style={{ marginTop: 20 }}
                   >
-                    ✉️ {c.sendEmailFallback}
+                    💬 {c.sendEmailFallback}
                   </a>
                 </div>
               ) : (

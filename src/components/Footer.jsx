@@ -27,7 +27,7 @@ export default function Footer() {
   const contactRows = [
     { href: '#contact', label: c.items[0].value },
     { href: 'tel:+923034030009', label: c.items[1].value },
-    { href: 'mailto:hussainihomes@gmail.com', label: c.items[2].value },
+    { href: '#contact', label: c.items[2].value },
     { href: '#contact', label: c.items[3].value },
   ];
 
