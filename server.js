@@ -83,6 +83,11 @@ function serveStatic(req, res, urlPath) {
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  if (url.pathname === '/health' || url.pathname === '/_ping') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+    res.end('{"ok":true}');
+    return;
+  }
   if (url.pathname.startsWith('/api/')) {
     handleApi(req, res).catch(e => {
       res.writeHead(500, { 'Content-Type': 'application/json' });
