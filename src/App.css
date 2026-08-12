@@ -4124,6 +4124,16 @@
   .fab-icon-glyph { font-size: 1.2rem; }
 }
 
+/* RTL / Urdu — mirror the floating buttons to the LEFT,
+   cards expand rightward from the icon */
+[dir="rtl"] .fabs { right: auto; left: 24px; }
+[dir="rtl"] .fab-card { transform-origin: left center; }
+[dir="rtl"] .fab-card-inner { padding: 0 24px 0 22px; transform: translateX(-12px); }
+[dir="rtl"] .fab-icon { margin-left: 0; margin-right: -2px; }
+@media (max-width: 480px) {
+  [dir="rtl"] .fabs { left: 18px; }
+}
+
 /* Reduced motion — instant, still usable */
 @media (prefers-reduced-motion: reduce) {
   .fab-card,
