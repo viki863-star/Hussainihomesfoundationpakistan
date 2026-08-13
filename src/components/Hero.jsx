@@ -55,6 +55,11 @@ export default function Hero() {
   const videoRef = useRef(null);
   const railRef = useRef(null);
   const endedRef = useRef(false);
+  const targetRef = useRef(0);
+  const shownRef = useRef(0);
+  const writtenRef = useRef(-1);
+  const durationRef = useRef(0);
+  const touchDragRef = useRef(null);
 
   /* Live `prefers-reduced-motion` → static poster + normal scrolling */
   useEffect(() => {
@@ -84,23 +89,69 @@ export default function Hero() {
     };
   }, []);
 
-  /* ─── Scroll scrub loop ─── */
+  /* ─── Shared scrub sink ───
+     Writes a single progress value (0..1) to the rail + video timeline.
+     Both the desktop scroll loop and the mobile touch handlers feed this. */
+  const applyScrub = (p) => {
+    const shown = Math.min(1, Math.max(0, p));
+    if (railRef.current) railRef.current.style.transform = `scaleY(${shown.toFixed(3)})`;
+
+    const done = shown >= FINAL_PROGRESS;
+    if (done !== endedRef.current) {
+      endedRef.current = done;
+      setEnded(done);
+    }
+
+    const duration = durationRef.current;
+    const video = videoRef.current;
+    if (duration > 0 && video && video.readyState >= 1) {
+      const raw = shown * (duration - 0.05);
+      const next = Math.min(Math.max(raw, 0), duration - 0.04);
+      const snapped = Math.round(next / KEYFRAME_STEP) * KEYFRAME_STEP;
+      if (Math.abs(snapped - writtenRef.current) >= SCRUB_EPS) {
+        writtenRef.current = snapped;
+        try { video.currentTime = Math.min(snapped, duration - 0.04); } catch { /* ignore */ }
+      }
+    }
+  };
+
+  /* ─── Mobile: direct touch-drag scrub ───
+     Finger drag = the video timeline. Vertical drag still scrolls the page
+     (native `touch-action: pan-y`), horizontal drag scrubs the story. */
+  const handleTouchStart = (e) => {
+    if (!e.touches || !e.touches[0]) return;
+    touchDragRef.current = {
+      x: e.touches[0].clientX,
+      base: shownRef.current,
+    };
+  };
+  const handleTouchMove = (e) => {
+    const d = touchDragRef.current;
+    if (!d || !e.touches || !e.touches[0]) return;
+    const dx = e.touches[0].clientX - d.x;
+    const span = Math.max(window.innerWidth || 360, 320) * 1.5;
+    targetRef.current = Math.min(1, Math.max(0, d.base + dx / span));
+  };
+  const handleTouchEnd = () => {
+    touchDragRef.current = null;
+  };
+
+  /* ─── Scrub driver ───
+     One rAF loop owns the easing + video writes. Desktop feeds `targetRef`
+     from scroll position through the track; when dragging on mobile the
+     touch handlers wrote it already. */
   useEffect(() => {
     if (reduced) return;
     const track = trackRef.current;
     const video = videoRef.current;
     if (!track || !video) return;
 
-    let duration = 0;
-    let target = 0;
-    let shown = 0;
-    let written = -1;
     let raf = 0;
 
     const onReady = () => {
       const d = video.duration;
       if (d && Number.isFinite(d) && d > 0) {
-        duration = d;
+        durationRef.current = d;
         try { video.currentTime = 0; } catch { /* ignore */ }
       }
     };
@@ -109,40 +160,27 @@ export default function Hero() {
     onReady();
 
     const tick = () => {
-      /* Progress through the track (0 at the top, 1 at the release point) */
-      const rect = track.getBoundingClientRect();
-      const vh = window.innerHeight || 1;
-      const span = rect.height - vh;
-      if (span > 0 && rect.bottom > 0 && rect.top < vh) {
-        const p = rect.top < 0 ? -rect.top / span : 0;
-        target = Math.min(1, Math.max(0, p));
-      }
-
-      /* Smooth follow + snap to target when idle */
-      shown += (target - shown) * SCRUB_FACTOR;
-      if (Math.abs(target - shown) < 0.0004) shown = target;
-
-      /* Journey-complete threshold — a handful of state flips, not per-pixel */
-      const done = shown >= FINAL_PROGRESS;
-      if (done !== endedRef.current) {
-        endedRef.current = done;
-        setEnded(done);
-      }
-
-      /* Direct style updates — no React re-render while scrolling */
-      if (railRef.current) railRef.current.style.transform = `scaleY(${shown.toFixed(3)})`;
-
-      /* Map progress onto the video timeline, clamped to the keyframe grid
-         so every seek lands on an IDR frame (decoder decodes 1 frame/step). */
-      if (duration > 0 && video.readyState >= 1) {
-        const raw = shown * (duration - 0.05);
-        const next = Math.min(Math.max(raw, 0), duration - 0.04);
-        const snapped = Math.round(next / KEYFRAME_STEP) * KEYFRAME_STEP;
-        if (Math.abs(snapped - written) >= SCRUB_EPS) {
-          written = snapped;
-          try { video.currentTime = Math.min(snapped, duration - 0.04); } catch { /* ignore */ }
+      /* Desktop: progress through the track (0 at top, 1 at release point).
+         Mobile: target was already set by the touch handlers. */
+      if (!isMobile) {
+        const rect = track.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+        const span = rect.height - vh;
+        if (span > 0 && rect.bottom > 0 && rect.top < vh) {
+          const p = rect.top < 0 ? -rect.top / span : 0;
+          targetRef.current = Math.min(1, Math.max(0, p));
         }
       }
+
+      /* Smooth follow + snap to target when idle. While a finger is down the
+         easing is snapier so scrubbing feels direct. */
+      const factor = touchDragRef.current ? 0.42 : SCRUB_FACTOR;
+      let shown = shownRef.current;
+      shown += (targetRef.current - shown) * factor;
+      if (Math.abs(targetRef.current - shown) < 0.0004) shown = targetRef.current;
+      shownRef.current = shown;
+
+      applyScrub(shown);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -168,8 +206,12 @@ export default function Hero() {
       </div>
 
       <div className="cine-hint" aria-hidden="true">
-        <div className="hero-scroll-mouse"><div className="hero-scroll-wheel" /></div>
-        <span className="hero-scroll-text">{h.scroll}</span>
+        {isMobile ? (
+          <div className="hero-scroll-swipe"><span>⇠</span><span>⇢</span></div>
+        ) : (
+          <div className="hero-scroll-mouse"><div className="hero-scroll-wheel" /></div>
+        )}
+        <span className="hero-scroll-text">{isMobile ? h.swipe : h.scroll}</span>
       </div>
 
       <div className="cine-rail" aria-hidden="true">
@@ -195,7 +237,15 @@ export default function Hero() {
 
   return (
     <div className="cine-hero-track" ref={trackRef}>
-      <section className={`cine-hero${ended ? ' ended' : ''}`} id="home" aria-labelledby="hero-title">
+      <section
+        className={`cine-hero${ended ? ' ended' : ''}${isMobile ? ' cine-hero-touch' : ''}`}
+        id="home"
+        aria-labelledby="hero-title"
+        onTouchStart={isMobile ? handleTouchStart : undefined}
+        onTouchMove={isMobile ? handleTouchMove : undefined}
+        onTouchEnd={isMobile ? handleTouchEnd : undefined}
+        onTouchCancel={isMobile ? handleTouchEnd : undefined}
+      >
         <div className="cine-canvas">
           <video
             className="cine-video"

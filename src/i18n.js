@@ -40,6 +40,7 @@ export const translations = {
       chip2Title: 'Education First',
       chip2Sub: 'Since 2018',
       scroll: 'Scroll',
+      swipe: 'Swipe to explore',
     },
     // Marquee
     marquee: [
@@ -318,6 +319,7 @@ Together, let us build a future where no orphan feels alone and every child has 
       chip2Title: 'تعلیم پہلے',
       chip2Sub: '۲۰۱۸ء سے',
       scroll: 'نیچے دیکھیں',
+      swipe: 'گھسیٹ کر دیکھیں',
     },
     // Marquee
     marquee: [
