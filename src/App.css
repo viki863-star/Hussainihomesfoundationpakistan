@@ -437,17 +437,16 @@
    HERO â€” PINNED CINEMATIC SCROLL SEQUENCE
    ============================================ */
 /* Tall scroll track — the hero "pins" only while the page scrolls through it */
-.cine-track {
-  position: relative;
-  height: 420vh; /* scroll room: 4 frames + resolution */
-  background: var(--ink);
-}
 .cine-hero {
-  position: sticky;
-  top: 0;
+  position: relative;
   height: 100svh;
   background: var(--ink);
   overflow: hidden;
+}
+.cine-hero.cine-locked {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
 }
 .cine-viewport {
   position: relative;
@@ -464,8 +463,18 @@
   position: absolute;
   inset: 0;
   margin: 0;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity, clip-path;
   backface-visibility: hidden;
+}
+.cine-frame.active {
+  opacity: 1;
+  transform: scale(1);
+}
+.cine-frame.cine-frame-enter {
+  clip-path: inset(0 0 0 0 round 0%);
 }
 .cine-frame-img {
   position: absolute;
@@ -1988,7 +1997,6 @@
 @media (max-width: 1024px) {
   .hero-actions { justify-content: center; }
   .hero-trust { justify-content: center; }
-  .cine-track { height: 380vh; }
   
   .about-layout { grid-template-columns: 1fr; gap: 48px; }
   .about-img-accent { width: 160px; right: -12px; bottom: -12px; }
@@ -2056,7 +2064,6 @@
 
 @media (max-width: 480px) {
   
-  .cine-track { height: 340vh; }
   .hero-stats { grid-template-columns: 1fr; gap: 0; }
   .hero-stat:not(:last-child)::after { display: none; }
   .team-grid { grid-template-columns: 1fr 1fr; }
@@ -3917,7 +3924,6 @@ html.iab .fab.open .fab-ripple {
   .cine-frame, .cine-caption, .cine-resolve, .cine-rail-fill {
     transition: none !important;
   }
-  .cine-track { height: 100svh; }
   .cine-caption, .cine-hint, .cine-rail {
     display: none !important;
   }

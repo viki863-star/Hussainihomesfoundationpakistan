@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLang } from '../LangContext';
 import { useSiteImages } from '../siteImages';
 import { useContent } from '../useContent';
@@ -34,19 +34,6 @@ function Stat({ number, label, prefix = '', suffix = '', active = true }) {
   );
 }
 
-/* ─── Scroll helpers ─── */
-function clamp01(n) {
-  return n < 0 ? 0 : n > 1 ? 1 : n;
-}
-function sweep(a, b, p) {
-  if (a >= b) return clamp01(p);
-  const t = clamp01((p - a) / (b - a));
-  return t * t * (3 - 2 * t);
-}
-function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
-
 /* ─── Main Cinematic Hero ─── */
 export default function Hero() {
   const { t, isUrdu } = useLang();
@@ -60,23 +47,35 @@ export default function Hero() {
     []
   );
 
-  const trackRef = useRef(null);
-  const stickyRef = useRef(null);
-  const frameRefs = useRef([]);
-  const capRefs = useRef([]);
+  const heroRef = useRef(null);
   const resolveRef = useRef(null);
   const railFillRef = useRef(null);
   const hintRef = useRef(null);
-  const resolved = useRef(false);
-  const [resolveActive, setResolveActive] = useState(reduced);
+
+  const [currentFrame, setCurrentFrame] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+  const [resolveActive, setResolveActive] = useState(false);
+  const [resolveVisible, setResolveVisible] = useState(false);
+
+  const currentFrameRef = useRef(0);
+  const isLockedRef = useRef(false);
+  const isAnimatingRef = useRef(false);
+  const resolvedRef = useRef(false);
+  const wheelAccum = useRef(0);
+  const touchStartY = useRef(0);
+  const touchStartTime = useRef(0);
+
+  useEffect(() => { currentFrameRef.current = currentFrame; }, [currentFrame]);
+  useEffect(() => { isLockedRef.current = isLocked; }, [isLocked]);
 
   const frames = [
-    { src: imgs.heroFrameSide,      alt: 'Hussaini Homes building — side view',     cap: h.frame1 },
-    { src: imgs.heroFrameLeft,      alt: 'Hussaini Homes building — left / front',  cap: h.frame2 },
-    { src: imgs.heroFrameFront,     alt: 'Hussaini Homes building — front view',    cap: h.frame3 },
-    { src: imgs.heroFrameInterior,  alt: 'Inside the Hussaini Homes building',       cap: h.frame4 },
+    { src: imgs.heroFrameSide,     alt: 'Hussaini Homes building — side view',     cap: h.frame1 },
+    { src: imgs.heroFrameLeft,     alt: 'Hussaini Homes building — left / front',  cap: h.frame2 },
+    { src: imgs.heroFrameFront,    alt: 'Hussaini Homes building — front view',    cap: h.frame3 },
+    { src: imgs.heroFrameInterior, alt: 'Inside the Hussaini Homes building',      cap: h.frame4 },
   ];
 
+  /* ─── Preload first frame ─── */
   useEffect(() => {
     if (!imgs.heroFrameSide || reduced) return;
     const link = document.createElement('link');
@@ -88,114 +87,7 @@ export default function Hero() {
     return () => link.remove();
   }, [imgs.heroFrameSide, reduced]);
 
-  // Pinned scroll choreography — driven by NATIVE page scroll (no wheel/touch hijack)
-  useEffect(() => {
-    if (reduced) return;
-    const track = trackRef.current;
-    const sticky = stickyRef.current;
-    if (!track || !sticky) return;
-
-    const compact = matchMedia('(max-width: 768px)').matches;
-    const motion = compact ? 0.5 : 1;
-
-    const loops = [
-      // side
-      { els: [frameRefs.current[0], capRefs.current[0]], inA: 0, inB: 0.02, outA: 0.2, outB: 0.29, tx: [-0.8, -2.4], sc: [1.06, 1.14] },
-      // left / front
-      { els: [frameRefs.current[1], capRefs.current[1]], inA: 0.2, inB: 0.28, outA: 0.42, outB: 0.51, tx: [1.2, -1.6], sc: [1.1, 1.18] },
-      // front
-      { els: [frameRefs.current[2], capRefs.current[2]], inA: 0.44, inB: 0.52, outA: 0.66, outB: 0.76, tx: [1.6, -1],  sc: [1.16, 1.24] },
-      // interior — stays until the end
-      { els: [frameRefs.current[3], capRefs.current[3]], inA: 0.7, inB: 0.84, outA: 2, outB: 2, tx: [0.8, 0], sc: [1.35, 1.0] },
-    ];
-
-    const apply = (el, opacity, tx, scale, clip) => {
-      if (!el) return;
-      el.style.opacity = opacity.toFixed(3);
-      if (clip) {
-        el.style.clipPath = clip;
-      } else {
-        el.style.clipPath = '';
-      }
-      el.style.transform = `translate3d(${tx.toFixed(2)}%, 0, 0) scale(${scale.toFixed(3)})`;
-    };
-
-    const capApply = (el, opacity, ty, tx) => {
-      if (!el) return;
-      el.style.opacity = opacity.toFixed(3);
-      el.style.transform = `translate3d(${tx.toFixed(1)}%, ${ty.toFixed(1)}px, 0)`;
-    };
-
-    let ticking = false;
-    const offset = () => {
-      ticking = false;
-      const rect = track.getBoundingClientRect();
-      const scrollable = Math.max(track.offsetHeight - sticky.offsetHeight, 1);
-      const p = clamp01(-rect.top / scrollable);
-
-      loops.forEach((l, i) => {
-        const exit = l.outA >= 2 ? 0 : sweep(l.outA, l.outB, p);
-        const opacity = sweep(l.inA, l.inB, p) * (1 - exit);
-        const lifetime = clamp01((p - l.inB) / Math.max((l.outA >= 2 ? 1 : l.outA) - l.inB, 0.001));
-        const tx = lerp(l.tx[0], l.tx[1], lifetime) * motion;
-        const scale = lerp(l.sc[0], l.sc[1], lifetime);
-        let clip = null;
-        if (i === 3) {
-          // "entering the home" — window expands open
-          const r = 1 - sweep(0.7, 0.86, p);
-          clip = `inset(${(46 * r).toFixed(1)}% ${(40 * r).toFixed(1)}% ${(42 * r).toFixed(1)}% ${(40 * r).toFixed(1)}% round ${(12 * r).toFixed(1)}%)`;
-        }
-        apply(l.els[0], opacity, tx, scale, clip);
-
-        const capIn = i === 0 ? 1 : sweep(l.inA + 0.02, l.inB + 0.03, p);
-        const capOut = l.outA >= 2
-          ? 1 - sweep(0.82, 0.93, p) // interior caption yields to the resolution panel
-          : 1 - sweep(l.outA - 0.04, l.outA, p);
-        capApply(l.els[1], Math.max(capIn * capOut, 0), (1 - capIn) * 18, tx * -0.4);
-      });
-
-      // resolution statement
-      const rp = sweep(0.84, 0.98, p);
-      if (resolveRef.current) {
-        resolveRef.current.style.opacity = rp.toFixed(3);
-        resolveRef.current.style.transform = `translate3d(0, ${(1 - rp) * 30}px, 0)`;
-      }
-      if (!resolved.current && rp > 0.5) {
-        resolved.current = true;
-        setResolveActive(true);
-      }
-
-      // scroll rail + hint
-      if (railFillRef.current) railFillRef.current.style.transform = `scaleY(${p.toFixed(4)})`;
-      if (hintRef.current) {
-        hintRef.current.style.opacity = (1 - sweep(0, 0.06, p)).toFixed(3);
-      }
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(offset);
-      }
-    };
-    const onResize = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(offset);
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
-    offset();
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
-    };
-  }, [reduced, isUrdu]);
-
-  // Preload later frames while the first one plays
+  /* ─── Preload later frames ─── */
   useEffect(() => {
     if (reduced) return;
     const raf = requestAnimationFrame(() => {
@@ -209,10 +101,212 @@ export default function Hero() {
     return () => cancelAnimationFrame(raf);
   }, [reduced, imgs.heroFrameLeft, imgs.heroFrameFront, imgs.heroFrameInterior]);
 
+  /* ─── Lock / unlock body scroll ─── */
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [isLocked]);
+
+  /* ─── Advance / retreat frame ─── */
+  const advance = useCallback(() => {
+    if (isAnimatingRef.current) return;
+    const next = currentFrameRef.current + 1;
+    if (next > 3) {
+      isLockedRef.current = false;
+      setIsLocked(false);
+      setResolveVisible(true);
+      setResolveActive(true);
+      resolvedRef.current = true;
+      return;
+    }
+    isAnimatingRef.current = true;
+    currentFrameRef.current = next;
+    setCurrentFrame(next);
+    setTimeout(() => { isAnimatingRef.current = false; }, 900);
+  }, []);
+
+  const retreat = useCallback(() => {
+    if (isAnimatingRef.current) return;
+    const prev = currentFrameRef.current - 1;
+    if (prev < 0) {
+      isLockedRef.current = false;
+      setIsLocked(false);
+      return;
+    }
+    isAnimatingRef.current = true;
+    currentFrameRef.current = prev;
+    setCurrentFrame(prev);
+    setTimeout(() => { isAnimatingRef.current = false; }, 900);
+  }, []);
+
+  /* ─── Wheel handler ─── */
+  useEffect(() => {
+    if (reduced) return;
+    const hero = heroRef.current;
+    if (!hero) return;
+
+    const onWheel = (e) => {
+      const rect = hero.getBoundingClientRect();
+      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!heroInView) return;
+
+      if (!isLockedRef.current) {
+        e.preventDefault();
+        isLockedRef.current = true;
+        setIsLocked(true);
+        return;
+      }
+
+      e.preventDefault();
+      wheelAccum.current += e.deltaY;
+
+      const threshold = 40;
+      if (Math.abs(wheelAccum.current) >= threshold) {
+        if (wheelAccum.current > 0) {
+          advance();
+        } else {
+          retreat();
+        }
+        wheelAccum.current = 0;
+      }
+    };
+
+    hero.addEventListener('wheel', onWheel, { passive: false });
+    return () => hero.removeEventListener('wheel', onWheel);
+  }, [reduced, advance, retreat]);
+
+  /* ─── Touch handler ─── */
+  useEffect(() => {
+    if (reduced) return;
+    const hero = heroRef.current;
+    if (!hero) return;
+
+    const onTouchStart = (e) => {
+      const rect = hero.getBoundingClientRect();
+      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!heroInView) return;
+
+      touchStartY.current = e.touches[0].clientY;
+      touchStartTime.current = Date.now();
+
+      if (!isLockedRef.current) {
+        isLockedRef.current = true;
+        setIsLocked(true);
+      }
+    };
+
+    const onTouchMove = (e) => {
+      if (!isLockedRef.current) return;
+      const deltaY = touchStartY.current - e.touches[0].clientY;
+      const elapsed = Date.now() - touchStartTime.current;
+
+      if (elapsed < 500 && Math.abs(deltaY) > 40) {
+        e.preventDefault();
+        if (deltaY > 0) {
+          advance();
+        } else {
+          retreat();
+        }
+        touchStartY.current = e.touches[0].clientY;
+        touchStartTime.current = Date.now();
+      }
+    };
+
+    const onTouchEnd = () => {
+      touchStartY.current = 0;
+    };
+
+    hero.addEventListener('touchstart', onTouchStart, { passive: true });
+    hero.addEventListener('touchmove', onTouchMove, { passive: false });
+    hero.addEventListener('touchend', onTouchEnd);
+    return () => {
+      hero.removeEventListener('touchstart', onTouchStart);
+      hero.removeEventListener('touchmove', onTouchMove);
+      hero.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [reduced, advance, retreat]);
+
+  /* ─── Keyboard handler ─── */
+  useEffect(() => {
+    if (reduced) return;
+    const hero = heroRef.current;
+    if (!hero) return;
+
+    const onKeyDown = (e) => {
+      const rect = hero.getBoundingClientRect();
+      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!heroInView) return;
+
+      if (!isLockedRef.current) {
+        if (e.key === 'ArrowDown' || e.key === ' ') {
+          e.preventDefault();
+          isLockedRef.current = true;
+          setIsLocked(true);
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        advance();
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        retreat();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [reduced, advance, retreat]);
+
+  /* ─── Resolution panel animation ─── */
+  useEffect(() => {
+    if (!resolveVisible || !resolveRef.current) return;
+    resolveRef.current.style.opacity = '0';
+    resolveRef.current.style.transform = 'translate3d(0, 30px, 0)';
+    requestAnimationFrame(() => {
+      if (resolveRef.current) {
+        resolveRef.current.style.transition = 'opacity 1s ease, transform 1s ease';
+        resolveRef.current.style.opacity = '1';
+        resolveRef.current.style.transform = 'translate3d(0, 0, 0)';
+      }
+    });
+  }, [resolveVisible]);
+
+  /* ─── Rail fill animation ─── */
+  useEffect(() => {
+    if (!railFillRef.current) return;
+    const p = (currentFrame + (resolveVisible ? 1 : 0)) / 4;
+    railFillRef.current.style.transform = `scaleY(${p})`;
+  }, [currentFrame, resolveVisible]);
+
   const dir = isUrdu ? 'rtl' : 'ltr';
 
+  const resolveScrollTo = useCallback((id) => {
+    isLockedRef.current = false;
+    setIsLocked(false);
+    setResolveVisible(true);
+    setResolveActive(true);
+    resolvedRef.current = true;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }, []);
+
   const resolution = (
-    <div className="cine-resolve" ref={resolveRef} style={reduced ? undefined : { opacity: 0 }}>
+    <div className="cine-resolve" ref={resolveRef} style={resolveVisible ? undefined : { opacity: 0, pointerEvents: 'none' }}>
       <div className="hero-badge cine-badge">
         <span className="hero-badge-dot" />
         <span>{h.badge}</span>
@@ -220,11 +314,11 @@ export default function Hero() {
       <h1 className="cine-title" id="hero-title">{h.tagline}</h1>
       <p className="cine-desc">{h.desc}</p>
       <div className="hero-actions cine-actions">
-        <a href="#donate" className="btn btn-primary btn-lg btn-shimmer hero-cta-primary">
+        <a href="#donate" className="btn btn-primary btn-lg btn-shimmer hero-cta-primary" onClick={(e) => { e.preventDefault(); resolveScrollTo('donate'); }}>
           <span className="hero-cta-heart">♥</span>
           {h.cta}
         </a>
-        <a href="#about" className="btn btn-outline hero-cta-secondary">
+        <a href="#about" className="btn btn-outline hero-cta-secondary" onClick={(e) => { e.preventDefault(); resolveScrollTo('about'); }}>
           {isUrdu ? 'مزید جانیں' : 'Learn More'}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -247,7 +341,7 @@ export default function Hero() {
   /* ── Reduced motion: calm static composition ── */
   if (reduced) {
     return (
-      <section className="cine-hero cine-hero-static" id="home" ref={trackRef} aria-labelledby="hero-title">
+      <section className="cine-hero cine-hero-static" id="home" ref={heroRef} aria-labelledby="hero-title">
         <div className="cine-frame cine-frame-still">
           <img className="cine-frame-img" src={imgs.heroFrameInterior} alt={frames[3].alt} decoding="async" />
           <div className="cine-scrim" aria-hidden="true" />
@@ -260,56 +354,56 @@ export default function Hero() {
   }
 
   return (
-    <section className="cine-track" id="home" ref={trackRef} aria-label="Hussaini Homes introduction">
-      <div className="cine-hero" ref={stickyRef} aria-labelledby="hero-title">
-        <div className="cine-viewport">
-          <div className="cine-stage" style={{ direction: dir }}>
-            {frames.map((f, i) => (
-              <figure
-                key={f.src + i}
-                className={`cine-frame cine-frame-${i + 1}`}
-                ref={el => { frameRefs.current[i] = el; }}
-                style={i === 0 ? { opacity: 1 } : undefined}
-              >
-                <img
-                  className="cine-frame-img"
-                  src={f.src}
-                  alt={f.alt}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  decoding="async"
-                  fetchPriority={i === 0 ? 'high' : 'low'}
-                />
-                <div className="cine-scrim" aria-hidden="true" />
-                <figcaption
-                  className="cine-caption"
-                  ref={el => { capRefs.current[i] = el; }}
-                  style={i === 0 ? { opacity: 1 } : { opacity: 0 }}
-                >
-                  <span className="cine-caption-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="cine-caption-text">{f.cap}</span>
-                </figcaption>
-              </figure>
-            ))}
+    <section className={`cine-hero${isLocked ? ' cine-locked' : ''}`} id="home" ref={heroRef} aria-labelledby="hero-title">
+      <div className="cine-viewport">
+        <div className="cine-stage" style={{ direction: dir }}>
+          {frames.map((f, i) => (
+            <figure
+              key={f.src + i}
+              className={`cine-frame${i === currentFrame ? ' active' : ''}${i === 3 && currentFrame === 3 ? ' cine-frame-enter' : ''}`}
+              aria-hidden={i !== currentFrame}
+            >
+              <img
+                className="cine-frame-img"
+                src={f.src}
+                alt={f.alt}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                fetchPriority={i === 0 ? 'high' : 'low'}
+              />
+              <div className="cine-scrim" aria-hidden="true" />
+              <figcaption className="cine-caption">
+                <span className="cine-caption-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span className="cine-caption-text">{f.cap}</span>
+              </figcaption>
+            </figure>
+          ))}
 
-            {resolution}
+          {resolution}
 
-            <div className="noise-overlay" aria-hidden="true" />
+          <div className="noise-overlay" aria-hidden="true" />
+          <div className="cine-vignette" aria-hidden="true" />
+          <div className="cine-bottom-fade" aria-hidden="true" />
+        </div>
 
-            <div className="cine-vignette" aria-hidden="true" />
-            <div className="cine-bottom-fade" aria-hidden="true" />
-          </div>
+        {/* Scroll progress rail */}
+        <div className="cine-rail" aria-hidden="true">
+          <span className="cine-rail-fill" ref={railFillRef} />
+        </div>
 
-          {/* Scroll progress rail */}
-          <div className="cine-rail" aria-hidden="true">
-            <span className="cine-rail-fill" ref={railFillRef} />
-          </div>
+        {/* Scroll hint */}
+        <div className="cine-hint" ref={hintRef} aria-hidden="true" style={{ opacity: currentFrame === 0 && !isLocked ? 1 : 0 }}>
+          <div className="hero-scroll-mouse"><div className="hero-scroll-wheel" /></div>
+          <span className="hero-scroll-text">{h.scroll}</span>
+          <span className="cine-hint-line" />
+        </div>
 
-          {/* Scroll hint */}
-          <div className="cine-hint" ref={hintRef} aria-hidden="true">
-            <div className="hero-scroll-mouse"><div className="hero-scroll-wheel" /></div>
-            <span className="hero-scroll-text">{h.scroll}</span>
-            <span className="cine-hint-line" />
-          </div>
+        {/* Frame indicator */}
+        <div className="cine-indicator" aria-hidden="true">
+          <span className={`cine-indicator-dot${currentFrame === 0 ? ' active' : ''}`} />
+          <span className={`cine-indicator-dot${currentFrame === 1 ? ' active' : ''}`} />
+          <span className={`cine-indicator-dot${currentFrame === 2 ? ' active' : ''}`} />
+          <span className={`cine-indicator-dot${currentFrame === 3 || resolveVisible ? ' active' : ''}`} />
         </div>
       </div>
     </section>
