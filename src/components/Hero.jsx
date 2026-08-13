@@ -27,6 +27,10 @@ const HERO_POSTER_MOBILE = withBase('/images/hero-poster-mobile.jpg');
 const SCRUB_FACTOR = 0.14;   // smoothing: lower = heavier, higher = snappier
 const SCRUB_EPS = 0.01;      // seconds — smallest currentTime change we write
 const FINAL_PROGRESS = 0.97; // progress that counts as "journey complete"
+/* The videos are encoded with an IDR keyframe every 0.5s, so we snap each
+   seek onto that grid. Landing exactly on a keyframe means the browser
+   decodes a single frame per step — no decode bursts, no scroll hang. */
+const KEYFRAME_STEP = 0.5;
 
 function prefersReducedMotion() {
   return (
@@ -128,13 +132,15 @@ export default function Hero() {
       /* Direct style updates — no React re-render while scrolling */
       if (railRef.current) railRef.current.style.transform = `scaleY(${shown.toFixed(3)})`;
 
-      /* Map progress onto the video timeline, clamped, with a small deadzone
-         so the video never jitters while the user is resting. */
+      /* Map progress onto the video timeline, clamped to the keyframe grid
+         so every seek lands on an IDR frame (decoder decodes 1 frame/step). */
       if (duration > 0 && video.readyState >= 1) {
-        const next = shown * (duration - 0.05);
-        if (Math.abs(next - written) >= SCRUB_EPS) {
-          written = next;
-          try { video.currentTime = Math.min(Math.max(next, 0), duration - 0.04); } catch { /* ignore */ }
+        const raw = shown * (duration - 0.05);
+        const next = Math.min(Math.max(raw, 0), duration - 0.04);
+        const snapped = Math.round(next / KEYFRAME_STEP) * KEYFRAME_STEP;
+        if (Math.abs(snapped - written) >= SCRUB_EPS) {
+          written = snapped;
+          try { video.currentTime = Math.min(snapped, duration - 0.04); } catch { /* ignore */ }
         }
       }
       raf = requestAnimationFrame(tick);
