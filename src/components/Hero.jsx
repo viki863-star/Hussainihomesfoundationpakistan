@@ -64,6 +64,7 @@ export default function Hero() {
   const wheelAccum = useRef(0);
   const touchStartY = useRef(0);
   const touchStartTime = useRef(0);
+  const rafRef = useRef(null);
 
   useEffect(() => { currentFrameRef.current = currentFrame; }, [currentFrame]);
   useEffect(() => { isLockedRef.current = isLocked; }, [isLocked]);
@@ -103,16 +104,23 @@ export default function Hero() {
 
   /* ─── Lock / unlock body scroll ─── */
   useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    const originalTouchAction = document.body.style.touchAction;
+    const originalOverscroll = document.body.style.overscrollBehavior;
+    
     if (isLocked) {
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
+      document.body.style.overscrollBehavior = 'none';
     } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
+      document.body.style.overflow = originalOverflow;
+      document.body.style.touchAction = originalTouchAction;
+      document.body.style.overscrollBehavior = originalOverscroll;
     }
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
+      document.body.style.overflow = originalOverflow;
+      document.body.style.touchAction = originalTouchAction;
+      document.body.style.overscrollBehavior = originalOverscroll;
     };
   }, [isLocked]);
 
@@ -138,7 +146,6 @@ export default function Hero() {
     if (isAnimatingRef.current) return;
     const prev = currentFrameRef.current - 1;
     if (prev < 0) {
-      // Back to frame 1 → unlock
       isLockedRef.current = false;
       setIsLocked(false);
       return;
@@ -149,18 +156,20 @@ export default function Hero() {
     setTimeout(() => { isAnimatingRef.current = false; }, 900);
   }, []);
 
-  /* ─── Wheel handler ─── */
+  /* ─── Wheel handler (window-level) ─── */
   useEffect(() => {
     if (reduced) return;
-    const hero = heroRef.current;
-    if (!hero) return;
 
     const onWheel = (e) => {
-      const heroInView = hero.getBoundingClientRect().top < window.innerHeight && hero.getBoundingClientRect().bottom > 0;
-      if (!heroInView) return;
-
-      // First interaction: lock hero
       if (!isLockedRef.current) {
+        // Check if hero is in view
+        const hero = heroRef.current;
+        if (!hero) return;
+        const rect = hero.getBoundingClientRect();
+        const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
+        if (!heroInView) return;
+
+        // First interaction: lock hero
         e.preventDefault();
         isLockedRef.current = true;
         setIsLocked(true);
@@ -171,7 +180,7 @@ export default function Hero() {
       e.preventDefault();
       wheelAccum.current += e.deltaY;
 
-      const threshold = 40;
+      const threshold = 30;
       if (Math.abs(wheelAccum.current) >= threshold) {
         if (wheelAccum.current > 0) {
           advance();
@@ -182,18 +191,19 @@ export default function Hero() {
       }
     };
 
-    hero.addEventListener('wheel', onWheel, { passive: false });
-    return () => hero.removeEventListener('wheel', onWheel);
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
   }, [reduced, advance, retreat]);
 
-  /* ─── Touch handler ─── */
+  /* ─── Touch handler (window-level) ─── */
   useEffect(() => {
     if (reduced) return;
-    const hero = heroRef.current;
-    if (!hero) return;
 
     const onTouchStart = (e) => {
-      const heroInView = hero.getBoundingClientRect().top < window.innerHeight && hero.getBoundingClientRect().bottom > 0;
+      const hero = heroRef.current;
+      if (!hero) return;
+      const rect = hero.getBoundingClientRect();
+      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
       if (!heroInView) return;
 
       touchStartY.current = e.touches[0].clientY;
@@ -207,11 +217,11 @@ export default function Hero() {
 
     const onTouchMove = (e) => {
       if (!isLockedRef.current) return;
+      
       const deltaY = touchStartY.current - e.touches[0].clientY;
       const elapsed = Date.now() - touchStartTime.current;
 
-      // Only trigger on fast swipes (prevents accidental triggers during slow scroll)
-      if (elapsed < 500 && Math.abs(deltaY) > 50) {
+      if (elapsed < 500 && Math.abs(deltaY) > 40) {
         e.preventDefault();
         if (deltaY > 0) {
           advance();
@@ -227,27 +237,28 @@ export default function Hero() {
       touchStartY.current = 0;
     };
 
-    hero.addEventListener('touchstart', onTouchStart, { passive: true });
-    hero.addEventListener('touchmove', onTouchMove, { passive: false });
-    hero.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
     return () => {
-      hero.removeEventListener('touchstart', onTouchStart);
-      hero.removeEventListener('touchmove', onTouchMove);
-      hero.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
     };
   }, [reduced, advance, retreat]);
 
   /* ─── Keyboard handler ─── */
   useEffect(() => {
     if (reduced) return;
-    const hero = heroRef.current;
-    if (!hero) return;
 
     const onKeyDown = (e) => {
-      const heroInView = hero.getBoundingClientRect().top < window.innerHeight && hero.getBoundingClientRect().bottom > 0;
-      if (!heroInView) return;
-
       if (!isLockedRef.current) {
+        const hero = heroRef.current;
+        if (!hero) return;
+        const rect = hero.getBoundingClientRect();
+        const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
+        if (!heroInView) return;
+
         if (e.key === 'ArrowDown' || e.key === ' ') {
           e.preventDefault();
           isLockedRef.current = true;
