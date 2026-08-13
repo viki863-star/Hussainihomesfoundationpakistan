@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { withBase } from './paths';
 
 export const SITE_IMAGE_DEFAULTS = {
-  heroBuilding: withBase('/images/Bulding Pic 2.jpeg'),
+  heroBuilding: withBase('/images/about-story-accent.webp'),
   heroFrameSide: withBase('/images/hero-frame-side.jpeg'),
   heroFrameLeft: withBase('/images/hero-frame-left.jpeg'),
   heroFrameFront: withBase('/images/hero-frame-front.jpeg'),
   heroFrameInterior: withBase('/images/hero-frame-interior.jpeg'),
-  aboutBuilding: withBase('/images/building-night.jpg'),
+  aboutBuilding: withBase('/images/about-story-main.webp'),
   constructionBegin: withBase('/images/construction-beginning.webp'),
   constructionToday: withBase('/images/construction-today.webp'),
   constructionPoster: withBase('/images/construction-journey-poster.webp'),
