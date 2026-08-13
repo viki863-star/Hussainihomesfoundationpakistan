@@ -102,7 +102,7 @@ export default function Hero() {
     document.body.style.position = 'fixed';
     document.body.style.top = `-${savedScrollY.current}px`;
     document.body.style.width = '100%';
-    document.body.style.touchAction = 'none';
+    document.documentElement.style.overflow = 'hidden';
   }, []);
 
   const unlockBody = useCallback(() => {
@@ -110,7 +110,7 @@ export default function Hero() {
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.width = '';
-    document.body.style.touchAction = '';
+    document.documentElement.style.overflow = '';
     window.scrollTo(0, savedScrollY.current);
   }, []);
 
@@ -159,18 +159,21 @@ export default function Hero() {
     });
   }, [unlockBody]);
 
+  const isHeroInView = useCallback(() => {
+    const hero = heroRef.current;
+    if (!hero) return false;
+    const rect = hero.getBoundingClientRect();
+    return rect.top < window.innerHeight && rect.bottom > 0;
+  }, []);
+
   /* ─── Wheel handler (window-level) ─── */
   useEffect(() => {
     if (reduced) return;
 
     const onWheel = (e) => {
-      if (!isLockedRef.current) {
-        const hero = heroRef.current;
-        if (!hero) return;
-        const rect = hero.getBoundingClientRect();
-        const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
-        if (!heroInView) return;
+      if (!isHeroInView()) return;
 
+      if (!isLockedRef.current) {
         e.preventDefault();
         isLockedRef.current = true;
         lockBody();
@@ -193,19 +196,14 @@ export default function Hero() {
 
     window.addEventListener('wheel', onWheel, { passive: false });
     return () => window.removeEventListener('wheel', onWheel);
-  }, [reduced, advance, retreat, lockBody]);
+  }, [reduced, advance, retreat, lockBody, isHeroInView]);
 
   /* ─── Touch handler (window-level) ─── */
   useEffect(() => {
     if (reduced) return;
 
     const onTouchStart = (e) => {
-      const hero = heroRef.current;
-      if (!hero) return;
-      const rect = hero.getBoundingClientRect();
-      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
-      if (!heroInView) return;
-
+      if (!isHeroInView()) return;
       touchStartY.current = e.touches[0].clientY;
       touchStartTime.current = Date.now();
 
@@ -244,18 +242,14 @@ export default function Hero() {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [reduced, advance, retreat, lockBody]);
+  }, [reduced, advance, retreat, lockBody, isHeroInView]);
 
   /* ─── Keyboard handler ─── */
   useEffect(() => {
     if (reduced) return;
 
     const onKeyDown = (e) => {
-      const hero = heroRef.current;
-      if (!hero) return;
-      const rect = hero.getBoundingClientRect();
-      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
-      if (!heroInView) return;
+      if (!isHeroInView()) return;
 
       if (!isLockedRef.current) {
         if (e.key === 'ArrowDown' || e.key === ' ') {
@@ -277,7 +271,7 @@ export default function Hero() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [reduced, advance, retreat, lockBody]);
+  }, [reduced, advance, retreat, lockBody, isHeroInView]);
 
   /* ─── Resolution panel animation ─── */
   useEffect(() => {
