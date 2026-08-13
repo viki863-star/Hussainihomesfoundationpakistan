@@ -1166,13 +1166,16 @@
 .cine-hero-static .cine-hint,
 .cine-hero-static .cine-rail { display: none !important; }
 
-/* ── Mobile — lighter chrome, shorter journey ── */
+/* ── Mobile — lighter chrome, shorter journey, dedicated portrait 9:16 video ── */
 @media (max-width: 767px) {
   .cine-hero-track { height: 240vh; }
-  .cine-copy { bottom: clamp(96px, 15vh, 132px); }
-  .cine-title { font-size: clamp(1.7rem, 7.2vw, 2.6rem); }
-  .cine-hint { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .cine-copy { bottom: clamp(108px, 16vh, 140px); }
+  .cine-title { font-size: clamp(1.75rem, 6.4vw, 2.4rem); }
+  .cine-eyebrow { font-size: 0.66rem; gap: 10px; }
+  .cine-cta { padding: 12px 20px; font-size: 0.88rem; }
+  .cine-hint { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); gap: 7px; }
   .cine-rail { display: none; }
+  .cine-bottom-fade { height: 110px; }
 }
 
 /* ============================================

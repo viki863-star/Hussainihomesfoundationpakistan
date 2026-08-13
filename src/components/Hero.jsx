@@ -20,6 +20,8 @@ import { withBase } from '../paths';
   touched on rare thresholds (journey-complete), never per pixel.
 */
 const HERO_VIDEO = withBase('/images/hero-cinematic.mp4');
+const HERO_VIDEO_MOBILE = withBase('/images/hero-cinematic-mobile.mp4');
+const HERO_POSTER_MOBILE = withBase('/images/hero-poster-mobile.jpg');
 
 /* Scrub tuning */
 const SCRUB_FACTOR = 0.14;   // smoothing: lower = heavier, higher = snappier
@@ -41,6 +43,9 @@ export default function Hero() {
 
   const [reduced, setReduced] = useState(prefersReducedMotion);
   const [ended, setEnded] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 767px)').matches
+  );
 
   const trackRef = useRef(null);
   const videoRef = useRef(null);
@@ -52,6 +57,20 @@ export default function Hero() {
     const mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!mq) return;
     const onChange = () => setReduced(mq.matches);
+    onChange();
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange);
+    else if (typeof mq.addListener === 'function') mq.addListener(onChange);
+    return () => {
+      if (typeof mq.removeEventListener === 'function') mq.removeEventListener('change', onChange);
+      else if (typeof mq.removeListener === 'function') mq.removeListener(onChange);
+    };
+  }, []);
+
+  /* Live mobile/portrait detection → use the dedicated 9:16 video */
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 767px)');
+    const onChange = () => setIsMobile(mq.matches);
     onChange();
     if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange);
     else if (typeof mq.addListener === 'function') mq.addListener(onChange);
@@ -83,6 +102,7 @@ export default function Hero() {
     };
     video.addEventListener('loadedmetadata', onReady);
     video.addEventListener('loadeddata', onReady);
+    onReady();
 
     const tick = () => {
       /* Progress through the track (0 at the top, 1 at the release point) */
@@ -126,7 +146,7 @@ export default function Hero() {
       video.removeEventListener('loadedmetadata', onReady);
       video.removeEventListener('loadeddata', onReady);
     };
-  }, [reduced]);
+  }, [reduced, isMobile]);
 
   const overlay = (
     <>
@@ -174,8 +194,9 @@ export default function Hero() {
           <video
             className="cine-video"
             ref={videoRef}
-            src={HERO_VIDEO}
-            poster={imgs.heroFrameSide}
+            key={isMobile ? 'm' : 'd'}
+            src={isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO}
+            poster={isMobile ? HERO_POSTER_MOBILE : imgs.heroFrameSide}
             preload="auto"
             muted
             playsInline
