@@ -67,6 +67,8 @@ export function useTeamData() {
 
 export function memberPhoto(member) {
   const p = member && member.photo;
-  if (!p) return withBase(`/images/team/${member.id}.png`);
+  // No photo on file — return '' so the letter-avatar fallback renders
+  // immediately instead of requesting a nonexistent /images/team/<id>.png.
+  if (!p) return '';
   return withBase(p.startsWith('/') ? p : `/images/team/${p}`);
 }

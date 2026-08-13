@@ -3,6 +3,10 @@ import { withBase } from './paths';
 
 export const SITE_IMAGE_DEFAULTS = {
   heroBuilding: withBase('/images/Bulding Pic 2.jpeg'),
+  heroFrameSide: withBase('/images/hero-frame-side.jpeg'),
+  heroFrameLeft: withBase('/images/hero-frame-left.jpeg'),
+  heroFrameFront: withBase('/images/hero-frame-front.jpeg'),
+  heroFrameInterior: withBase('/images/hero-frame-interior.jpeg'),
   aboutBuilding: withBase('/images/building-night.jpg'),
   constructionBegin: withBase('/images/construction-beginning.webp'),
   constructionToday: withBase('/images/construction-today.webp'),

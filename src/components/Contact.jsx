@@ -1,13 +1,24 @@
 import { useState } from 'react';
 import { useLang } from '../LangContext';
+import { useContent } from '../useContent';
 
 const WHATSAPP_NUMBER = '923034030009';
 
 export default function Contact() {
   const { t, isUrdu } = useLang();
+  const content = useContent();
   const c = t.contact;
   const [sent, setSent] = useState(false);
   const [waUrl, setWaUrl] = useState('');
+
+  // Use the real email from content.json (admin-editable) instead of the
+  // "Coming Soon" placeholder baked into i18n.
+  const realEmail = (content && content.contact && content.contact.email) || '';
+  const items = c.items.map(it =>
+    String(it.value || '').toLowerCase() === 'coming soon' && realEmail
+      ? { ...it, value: realEmail }
+      : it
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -27,7 +38,7 @@ export default function Contact() {
   };
 
   return (
-    <section className="section contact-section" id="contact" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <section className="section contact-section" id="contact" dir={isUrdu ? 'rtl' : 'ltr'} aria-labelledby="contact-title">
       <div className="container">
         <div className="contact-layout">
           {/* Info column */}
@@ -35,14 +46,14 @@ export default function Contact() {
             <div className="section-eyebrow contact-info-eyebrow">
               {c.eyebrow}
             </div>
-            <h2 className="contact-info-title">
+            <h2 className="contact-info-title" id="contact-title">
               {c.title1}<br />
               <span className="text-gradient">{c.title2}</span>
             </h2>
             <p className="contact-info-desc">{c.desc}</p>
 
             <div className="contact-items">
-              {c.items.map((item, i) => (
+              {items.map((item, i) => (
                 <div key={i} className="contact-item-card">
                   <div className="contact-item-icon">{item.icon}</div>
                   <div className="contact-item-body">

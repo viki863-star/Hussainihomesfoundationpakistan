@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { translations } from './i18n';
+import { useContent, deepMerge } from './useContent';
 
 const LangContext = createContext();
 
@@ -10,7 +11,10 @@ export function LangProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     try { return localStorage.getItem('hh-theme') || 'dark'; } catch { return 'dark'; }
   });
-  const t = translations[lang];
+  const content = useContent();
+  const textOverrides = (content && content.text && content.text[lang]) || {};
+  const t = deepMerge(translations[lang], textOverrides);
+  const marquee = (t && t.marquee) || [];
   const toggle = () => setLang(l => (l === 'en' ? 'ur' : 'en'));
   const isUrdu = lang === 'ur';
   const isDark = theme === 'dark';
@@ -27,7 +31,7 @@ export function LangProvider({ children }) {
   }, [lang, isUrdu]);
 
   return (
-    <LangContext.Provider value={{ lang, t, toggle, isUrdu, theme, toggleTheme, isDark }}>
+    <LangContext.Provider value={{ lang, t, marquee, toggle, isUrdu, theme, toggleTheme, isDark }}>
       <div dir={isUrdu ? 'rtl' : 'ltr'} className={isUrdu ? 'urdu-mode' : ''}>
         {children}
       </div>

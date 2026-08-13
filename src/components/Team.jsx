@@ -6,7 +6,7 @@ import { useTeamData, memberPhoto } from '../teamData';
 function TeamAvatar({ src, name }) {
   const [err, setErr] = useState(false);
 
-  if (err) {
+  if (!src || err) {
     return <div className="team-avatar" aria-hidden="true">{name.charAt(0)}</div>;
   }
 
@@ -29,13 +29,13 @@ export default function Team() {
   const committees = teamData.committees;
 
   return (
-    <section className="section team-section" id="team" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <section className="section team-section" id="team" dir={isUrdu ? 'rtl' : 'ltr'} aria-labelledby="team-title">
       <div className="container">
         <div className="text-center">
           <div className="section-eyebrow" style={{ justifyContent: 'center' }}>
             {team.eyebrow}
           </div>
-          <h2 className="section-title">
+          <h2 className="section-title" id="team-title">
             {team.title}
           </h2>
           <p className="section-subtitle">

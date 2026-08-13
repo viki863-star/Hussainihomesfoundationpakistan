@@ -37,14 +37,14 @@ export default function Services() {
   const s = t.services;
 
   return (
-    <section className="section services-section" id="services" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <section className="section services-section" id="services" dir={isUrdu ? 'rtl' : 'ltr'} aria-labelledby="services-title">
       <div className="services-bg" aria-hidden="true" />
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         <div className="text-center">
           <div className="section-eyebrow" style={{ justifyContent: 'center' }}>
             {s.eyebrow}
           </div>
-          <h2 className="section-title" style={{ color: 'var(--white)' }}>
+          <h2 className="section-title" id="services-title" style={{ color: 'var(--white)' }}>
             {s.title}
           </h2>
           <p className="section-subtitle">

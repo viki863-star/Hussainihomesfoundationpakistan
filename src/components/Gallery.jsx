@@ -1,10 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLang } from '../LangContext';
 import { withBase } from '../paths';
+import { useFocusTrap } from '../useFocusTrap';
 
 function Lightbox({ items, index, onClose, setIndex }) {
+  const dialogRef = useRef(null);
   const next = useCallback(() => setIndex((index + 1) % items.length), [index, items.length, setIndex]);
   const prev = useCallback(() => setIndex((index - 1 + items.length) % items.length), [index, items.length, setIndex]);
+
+  useFocusTrap(dialogRef, true);
 
   useEffect(() => {
     const handler = e => {
@@ -23,7 +27,14 @@ function Lightbox({ items, index, onClose, setIndex }) {
   const item = items[index];
 
   return (
-    <div className="lightbox-overlay" onClick={onClose}>
+    <div
+      className="lightbox-overlay"
+      onClick={onClose}
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.label}
+    >
       <button className="lightbox-close" onClick={onClose} aria-label="Close">✕</button>
       <button className="lightbox-nav lightbox-nav-prev" onClick={e => { e.stopPropagation(); prev(); }} aria-label="Previous">‹</button>
       <div className="lightbox-content" onClick={e => e.stopPropagation()}>
@@ -101,13 +112,13 @@ export default function Gallery() {
   const cats = ['all', 'building', 'foundation', 'students', 'meals', 'school', 'prayer', 'events'];
 
   return (
-    <section className="section gallery-section" id="gallery" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <section className="section gallery-section" id="gallery" dir={isUrdu ? 'rtl' : 'ltr'} aria-labelledby="gallery-title">
       <div className="container">
         <div className="text-center">
           <div className="section-eyebrow" style={{ justifyContent: 'center' }}>
             {g.eyebrow}
           </div>
-          <h2 className="section-title">{g.title}</h2>
+          <h2 className="section-title" id="gallery-title">{g.title}</h2>
           <p className="section-subtitle">
             {g.subtitle}
           </p>

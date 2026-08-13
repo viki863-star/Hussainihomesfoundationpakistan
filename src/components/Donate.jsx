@@ -35,7 +35,7 @@ export default function Donate() {
   const mobilePay = content.donate.mobilePay;
 
   return (
-    <section className="section donate-section" id="donate" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <section className="section donate-section" id="donate" dir={isUrdu ? 'rtl' : 'ltr'} aria-labelledby="donate-title">
       {/* Animated background */}
       <div className="donate-bg" aria-hidden="true">
         <div className="donate-bg-orb donate-bg-orb-1" />
@@ -49,7 +49,7 @@ export default function Donate() {
           <div className="section-eyebrow" style={{ justifyContent: 'center' }}>
             {d.eyebrow}
           </div>
-          <h2 className="section-title">{d.title}</h2>
+          <h2 className="section-title" id="donate-title">{d.title}</h2>
           <p className="section-subtitle">{d.subtitle}</p>
         </div>
 

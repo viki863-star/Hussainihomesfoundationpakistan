@@ -10,7 +10,7 @@ const DIST = path.join(ROOT, 'dist');
 const DATA_DIR = path.join(PUBLIC, 'data');
 const CONFIG_FILE = path.join(__dirname, 'config.json');
 
-const ALLOWED_FOLDERS = new Set(['gallery', 'site-images', 'team']);
+const ALLOWED_FOLDERS = new Set(['gallery', 'site-images', 'team', 'stories']);
 const ALLOWED_EXT = new Set(['jpg', 'jpeg', 'png', 'jfif', 'webp', 'gif']);
 const MAX_BODY = 40 * 1024 * 1024;
 

@@ -1,12 +1,25 @@
 import { useLang } from '../LangContext';
+import { useContent } from '../useContent';
 import { useSiteImages } from '../siteImages';
 import { withBase } from '../paths';
 
 export default function Footer() {
   const { t, isUrdu } = useLang();
   const imgs = useSiteImages();
+  const content = useContent();
   const f = t.footer;
   const c = t.contact;
+
+  // Social links are admin-editable via content.json (footer.*).
+  // Only render links that actually point somewhere (#/empty placeholders
+  // are dropped so no dead buttons are shown).
+  const socials = (content && content.footer) || {};
+  const socialItems = [
+    { href: socials.facebook, label: 'Facebook', glyph: '📘' },
+    { href: socials.whatsapp, label: 'WhatsApp', glyph: '💬' },
+    { href: socials.youtube, label: 'YouTube', glyph: '▶️' },
+    { href: socials.instagram, label: 'Instagram', glyph: '📸' },
+  ].filter(s => s.href && s.href !== '#');
 
   const quickLinks = [
     { href: '#home', label: f.links.home },
@@ -44,10 +57,9 @@ export default function Footer() {
             </h3>
             <p>{f.desc}</p>
             <div className="footer-social">
-              <a href="https://www.facebook.com/Hussainihome" target="_blank" rel="noopener noreferrer" aria-label="Facebook">📘</a>
-              <a href="https://wa.me/923034030009" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">💬</a>
-              <a href="#" aria-label="YouTube">▶️</a>
-              <a href="#" aria-label="Instagram">📸</a>
+              {socialItems.map(s => (
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>{s.glyph}</a>
+              ))}
             </div>
           </div>
 

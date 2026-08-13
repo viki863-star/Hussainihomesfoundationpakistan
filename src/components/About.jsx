@@ -9,7 +9,7 @@ export default function About() {
   const featureIcons = ['🍽️', '🏠', '📚', '🏥', '👕', '🎯'];
 
   return (
-    <section className="section about-section" id="about">
+    <section className="section about-section" id="about" aria-labelledby="about-title">
       <div className="container">
         <div className="about-layout">
           {/* Left — Visuals */}
@@ -40,7 +40,7 @@ export default function About() {
               {a.eyebrow}
             </div>
 
-            <h2 className="about-title">
+            <h2 className="about-title" id="about-title">
               {a.title1}<br />
               <span className="text-gradient">{a.title2}</span>
             </h2>

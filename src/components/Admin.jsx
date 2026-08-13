@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { withBase } from '../paths';
+import { deepMerge } from '../useContent';
+import { translations } from '../i18n';
 
 const TOKEN_KEY = 'hh-admin-token';
 
@@ -25,6 +27,10 @@ const CAT_ICONS = {
 
 const IMAGE_SLOTS = [
   { key: 'heroBuilding', label: 'Hero Building Photo', hint: 'Big building photo at the top of the home page' },
+  { key: 'heroFrameSide', label: 'Hero Frame 1 — Side', hint: 'Cinematic hero: side view of the building (first frame)' },
+  { key: 'heroFrameLeft', label: 'Hero Frame 2 — Left / Front', hint: 'Cinematic hero: camera toward the left side / front (second frame)' },
+  { key: 'heroFrameFront', label: 'Hero Frame 3 — Front', hint: 'Cinematic hero: front view of the building (third frame)' },
+  { key: 'heroFrameInterior', label: 'Hero Frame 4 — Inside', hint: 'Cinematic hero: interior where children study or pray (final frame)' },
   { key: 'aboutBuilding', label: 'About Section Building', hint: 'Main photo in the About section' },
   { key: 'constructionBegin', label: 'Construction — Beginning', hint: 'First photo in the Building section (starting stage)' },
   { key: 'constructionToday', label: 'Construction — Today', hint: 'Second photo in the Building section (current stage)' },
@@ -88,6 +94,74 @@ export default function Admin() {
     },
     contact: { whatsapp: '923034030009', phone: '+92 303 4030009', email: 'hussainihomesfoundation@gmail.com', address: 'Parachinar, Kurram, KPK, Pakistan' },
     footer: { facebook: 'https://www.facebook.com/Hussainihome', whatsapp: 'https://wa.me/923034030009', youtube: '#', instagram: '#' },
+    theme: {
+      crimson: '#B91C1C', crimsonDark: '#7F1D1D', crimsonDeep: '#450A0A', crimsonLight: '#EF4444',
+      gold: '#D97706', goldBright: '#F59E0B', goldPale: '#FEF3C7', goldGlow: '#FBBF24',
+      surface: '#FAF7F7', surface2: '#F3EAEA', card: '#FFFFFF', text: '#1F1717', textMuted: '#6B5555',
+      ink: '#0F0A0A', inkMid: '#1C0D0D', accent: '#FFF5F5',
+    },
+    sections: [
+      { key: 'hero', label: 'Hero', enabled: true },
+      { key: 'about', label: 'About', enabled: true },
+      { key: 'services', label: 'Services', enabled: true },
+      { key: 'team', label: 'Team', enabled: true },
+      { key: 'building', label: 'Building Progress', enabled: true },
+      { key: 'construction', label: 'Construction Journey', enabled: true },
+      { key: 'gallery', label: 'Gallery', enabled: true },
+      { key: 'stories', label: 'Success Stories', enabled: true },
+      { key: 'donate', label: 'Donate', enabled: true },
+      { key: 'contact', label: 'Contact', enabled: true },
+    ],
+    text: { en: {}, ur: {} },
+    building: {
+      image: '/images/Bulding Pic 2.jpeg',
+      bars: [
+        { en: 'Ground Floor (Complete)', ur: 'گراؤنڈ فلور (مکمل)', target: 100 },
+        { en: 'First Floor (Complete)', ur: 'پہلی منزل (مکمل)', target: 100 },
+        { en: 'Second Floor (Structural)', ur: 'دوسری منزل (ڈھانچہ)', target: 100 },
+        { en: 'Third Floor (Planned)', ur: 'تیسری منزل (منصوبہ)', target: 0 },
+        { en: 'Interior Finishing', ur: 'اندرونی تکمیل', target: 10 },
+      ],
+      budget: [
+        { en: 'Total Budget', ur: 'کل بجٹ', value: 'PKR 45.5M' },
+        { en: 'Invested', ur: 'سرمایہ کاری', value: 'PKR 13M' },
+        { en: 'Monthly Cost', ur: 'ماہانہ خرچ', value: 'PKR 300K' },
+      ],
+      facilities: {
+        en: ['Spacious Dormitories', 'Modern Classrooms', 'Library & Computer Lab', 'Islamic Education Room', 'Dining Hall & Kitchen', 'Admin Offices', 'Outdoor Play Area'],
+        ur: ['کشادہ سونے کے کمرے', 'جدید کلاس رومز', 'لائبریری اور کمپیوٹر لیب', 'دینی تعلیم کا کمرہ', 'ڈائننگ ہال اور باورچی خانہ', 'انتظامی دفاتر', 'بیرونی کھیل کا میدان'],
+      },
+    },
+    construction: {
+      items: [
+        { labelEn: 'Site Preparation', labelUr: 'سائٹ کی تیاری', statusEn: 'Completed', statusUr: 'مکمل' },
+        { labelEn: 'Foundation', labelUr: 'فاؤنڈیشن', statusEn: 'Completed', statusUr: 'مکمل' },
+        { labelEn: 'Ground Floor', labelUr: 'گراؤنڈ فلور', statusEn: 'Completed', statusUr: 'مکمل' },
+        { labelEn: 'First Floor Structure', labelUr: 'پہلی منزل کا ڈھانچہ', statusEn: 'Completed', statusUr: 'مکمل' },
+      ],
+    },
+    stories: {
+      items: [
+        {
+          titleEn: 'A Family of 31 Children', titleUr: '۳۱ بچوں کا ایک خاندان',
+          textEn: 'Every child at Hussaini Homes is raised with love, discipline, and a sense of belonging — as members of one family.',
+          textUr: 'حسینی ہومز کا ہر بچہ محبت، نظم و ضبط اور اپنائیت کے ساتھ پرورش پاتا ہے — ایک ہی خاندان کے افراد کی طرح۔',
+          img: '/images/success-stories/all childern gorup pic.jfif',
+        },
+        {
+          titleEn: 'Study Time', titleUr: 'مطالعے کا وقت',
+          textEn: 'From early morning classes to evening revision, our children take their education seriously — and it shows.',
+          textUr: 'صبح کی کلاسوں سے لے کر شام کے تکرار تک، ہمارے بچے اپنی تعلیم کو سنجیدگی سے لیتے ہیں — اور نتائج بھی نظر آتے ہیں۔',
+          img: '/images/success-stories/study/Study time 1.jpeg',
+        },
+        {
+          titleEn: 'Together at the Table', titleUr: 'ساتھ میز پر',
+          textEn: 'Nutritious meals are served three times a day, shared together so no child ever eats alone.',
+          textUr: 'روزانہ تین وقت غذائیت بخش کھانا ساتھ مل کر پیش کیا جاتا ہے تاکہ کوئی بچہ تنہا کھانا نہ کھائے۔',
+          img: '/images/success-stories/eating/WhatsApp Image 2026-07-30 at 3.48.03 PM.jpeg',
+        },
+      ],
+    },
   });
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -124,14 +198,23 @@ export default function Admin() {
     setSite({ gallery: data.gallery || { items: [] }, images: data.images || {} });
     setTeam(data.team || { officials: [], committees: [] });
     if (data.content && typeof data.content === 'object') {
-      setContent(prev => ({ ...prev, ...data.content,
-        stats: { ...prev.stats, ...(data.content.stats || {}) },
-        donate: { ...prev.donate, ...(data.content.donate || {}),
-          bank: { ...prev.donate.bank, ...(data.content.donate?.bank || {}) },
-          mobilePay: data.content.donate?.mobilePay || prev.donate.mobilePay,
+      const c = data.content;
+      setContent(prev => ({
+        ...prev,
+        ...c,
+        stats: { ...prev.stats, ...(c.stats || {}) },
+        donate: { ...prev.donate, ...(c.donate || {}),
+          bank: { ...prev.donate.bank, ...(c.donate?.bank || {}) },
+          mobilePay: c.donate?.mobilePay || prev.donate.mobilePay,
         },
-        contact: { ...prev.contact, ...(data.content.contact || {}) },
-        footer: { ...prev.footer, ...(data.content.footer || {}) },
+        contact: { ...prev.contact, ...(c.contact || {}) },
+        footer: { ...prev.footer, ...(c.footer || {}) },
+        theme: { ...prev.theme, ...(c.theme || {}) },
+        sections: c.sections && c.sections.length ? c.sections : prev.sections,
+        text: { en: { ...(c.text?.en || {}) }, ur: { ...(c.text?.ur || {}) } },
+        building: { ...prev.building, ...(c.building || {}) },
+        construction: { ...prev.construction, ...(c.construction || {}) },
+        stories: { ...prev.stories, items: c.stories?.items && c.stories.items.length ? c.stories.items : prev.stories.items },
       }));
     }
   }, [api]);
@@ -181,13 +264,22 @@ export default function Admin() {
       <header className="adm-header">
         <div className="adm-header-left">
           <img src={withBase(site.images.logo) || withBase('/images/ELOGO.png')} alt="logo" className="adm-header-logo" />
-          <span className="adm-header-title">Photo Manager</span>
+          <div>
+            <span className="adm-header-title">Full Site Manager</span>
+            <span className="adm-header-sub">Hussaini Homes</span>
+          </div>
         </div>
         <nav className="adm-tabs">
+          <button className={`adm-tab${tab === 'dashboard' ? ' active' : ''}`} onClick={() => setTab('dashboard')}>🏠 Dashboard</button>
+          <button className={`adm-tab${tab === 'text' ? ' active' : ''}`} onClick={() => setTab('text')}>✍️ All Text</button>
+          <button className={`adm-tab${tab === 'sections' ? ' active' : ''}`} onClick={() => setTab('sections')}>🧩 Sections</button>
+          <button className={`adm-tab${tab === 'theme' ? ' active' : ''}`} onClick={() => setTab('theme')}>🎨 Theme</button>
           <button className={`adm-tab${tab === 'gallery' ? ' active' : ''}`} onClick={() => setTab('gallery')}>📷 Gallery</button>
+          <button className={`adm-tab${tab === 'stories' ? ' active' : ''}`} onClick={() => setTab('stories')}>📖 Stories</button>
+          <button className={`adm-tab${tab === 'building' ? ' active' : ''}`} onClick={() => setTab('building')}>🏗️ Building</button>
           <button className={`adm-tab${tab === 'team' ? ' active' : ''}`} onClick={() => setTab('team')}>👥 Team</button>
           <button className={`adm-tab${tab === 'photos' ? ' active' : ''}`} onClick={() => setTab('photos')}>🖼️ Photos</button>
-          <button className={`adm-tab${tab === 'content' ? ' active' : ''}`} onClick={() => setTab('content')}>✏️ Content</button>
+          <button className={`adm-tab${tab === 'content' ? ' active' : ''}`} onClick={() => setTab('content')}>📞 Contact</button>
           <button className={`adm-tab${tab === 'settings' ? ' active' : ''}`} onClick={() => setTab('settings')}>⚙️ Settings</button>
         </nav>
         <div className="adm-header-right">
@@ -197,6 +289,27 @@ export default function Admin() {
       </header>
 
       <main className="adm-main">
+        {tab === 'dashboard' && <DashboardEditor content={content} />}
+
+        {tab === 'text' && (
+          <TextEditor content={content} setContent={setContent} busy={busy} onSave={saveContent} />
+        )}
+
+        {tab === 'sections' && (
+          <SectionsEditor content={content} setContent={setContent} busy={busy} onSave={saveContent} />
+        )}
+
+        {tab === 'theme' && (
+          <ThemeEditor content={content} setContent={setContent} busy={busy} onSave={saveContent} />
+        )}
+
+        {tab === 'stories' && (
+          <StoriesEditor content={content} setContent={setContent} busy={busy} onSave={saveContent} api={api} />
+        )}
+
+        {tab === 'building' && (
+          <BuildingEditor content={content} setContent={setContent} busy={busy} onSave={saveContent} api={api} />
+        )}
         {tab === 'gallery' && (
           <>
             {editor && (
@@ -719,6 +832,703 @@ function TeamEditor({ team, setTeam, busy, api, onSave }) {
 }
 
 /* ============================================================
+   DASHBOARD — overview of the whole site
+   ============================================================ */
+function DashboardEditor({ content }) {
+  const sections = content.sections || [];
+  const galleryCount = 0;
+  const storyCount = (content.stories?.items || []).length;
+  const barCount = (content.building?.bars || []).length;
+
+  return (
+    <div className="adm-dashboard">
+      <div className="adm-toolbar">
+        <div>
+          <h2 className="adm-section-title">🏠 Full Site Manager</h2>
+          <p className="adm-sub">Everything on the website is editable from here — text, photos, colors, sections, donations, team and more. Changes save to the live site instantly.</p>
+        </div>
+      </div>
+
+      <div className="adm-dash-grid">
+        <div className="adm-dash-card">
+          <span className="adm-dash-icon">✍️</span>
+          <span className="adm-dash-num">∞</span>
+          <span className="adm-dash-label">All website text (EN + UR)</span>
+        </div>
+        <div className="adm-dash-card">
+          <span className="adm-dash-icon">🧩</span>
+          <span className="adm-dash-num">{sections.length}</span>
+          <span className="adm-dash-label">Sections (show/hide + reorder)</span>
+        </div>
+        <div className="adm-dash-card">
+          <span className="adm-dash-icon">🎨</span>
+          <span className="adm-dash-num">{Object.keys(content.theme || {}).length}</span>
+          <span className="adm-dash-label">Theme colors</span>
+        </div>
+        <div className="adm-dash-card">
+          <span className="adm-dash-icon">📖</span>
+          <span className="adm-dash-num">{storyCount}</span>
+          <span className="adm-dash-label">Success stories</span>
+        </div>
+        <div className="adm-dash-card">
+          <span className="adm-dash-icon">🏗️</span>
+          <span className="adm-dash-num">{barCount}</span>
+          <span className="adm-dash-label">Construction progress bars</span>
+        </div>
+        <div className="adm-dash-card">
+          <span className="adm-dash-icon">👥</span>
+          <span className="adm-dash-num">{galleryCount || '—'}</span>
+          <span className="adm-dash-label">Gallery photos & team</span>
+        </div>
+      </div>
+
+      <div className="adm-dash-tip">
+        💡 <strong>Tip:</strong> Start with the <em>All Text</em> tab to change any sentence on the site, then
+        <em> Theme</em> to change colors, <em>Sections</em> to reorder or hide blocks, and
+        <em> Gallery / Stories / Building</em> to swap photos.
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   GENERIC TEXT EDITOR — every string on the site, EN + UR
+   ============================================================ */
+const TEXT_ORDER = ['nav', 'hero', 'about', 'services', 'team', 'teamDetail', 'building', 'construction', 'gallery', 'stories', 'donate', 'contact', 'footer'];
+
+const GROUP_LABELS = {
+  nav: 'Navigation',
+  hero: 'Hero (top of page)',
+  about: 'About / Our Story',
+  services: 'Services',
+  team: 'Team',
+  teamDetail: 'Team Member Pages',
+  building: 'Building Progress',
+  construction: 'Construction Journey',
+  gallery: 'Gallery',
+  stories: 'Success Stories',
+  donate: 'Donate',
+  contact: 'Contact',
+  footer: 'Footer',
+};
+
+function TextEditor({ content, setContent, busy, onSave }) {
+  const [openTextGroup, setOpenTextGroup] = useState(null);
+  const setText = (lang, path, value) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const keys = path.split('.');
+      let obj = next.text[lang] = next.text[lang] || {};
+      for (let i = 0; i < keys.length - 1; i++) {
+        const k = keys[i];
+        const ni = Number(k);
+        if (Number.isInteger(ni) && Array.isArray(obj)) obj = obj[ni] = obj[ni] || {};
+        else obj = obj[k] = obj[k] || {};
+      }
+      const last = keys[keys.length - 1];
+      const lastIndex = Number(last);
+      if (Number.isInteger(lastIndex) && Array.isArray(obj)) {
+        for (let a = obj.length; a <= lastIndex; a++) obj[a] = undefined;
+        obj[lastIndex] = value;
+      } else {
+        obj[last] = value;
+      }
+      return next;
+    });
+  };
+
+  const langFor = lang => {
+    const base = translations[lang];
+    const over = content.text && content.text[lang];
+    return deepMerge(base, over || {});
+  };
+
+  const enMerged = langFor('en');
+  const urMerged = langFor('ur');
+
+  const isObject = v => v && typeof v === 'object' && !Array.isArray(v);
+  const isString = v => typeof v === 'string';
+  const isNumber = v => typeof v === 'number';
+
+  const renderString = (label, path, enVal, urVal, textarea) => (
+    <div className="adm-text-row" key={path}>
+      <span className="adm-text-label">{label}</span>
+      <div className="adm-text-inputs">
+        <div className="adm-text-input-wrap">
+          <span className="adm-text-badge">EN</span>
+          {textarea
+            ? <textarea className="adm-input adm-textarea" rows={3} value={enVal || ''} onChange={e => setText('en', path, e.target.value)} />
+            : <input className="adm-input" value={enVal || ''} onChange={e => setText('en', path, e.target.value)} />}
+        </div>
+        <div className="adm-text-input-wrap">
+          <span className="adm-text-badge adm-text-badge-ur">UR</span>
+          {textarea
+            ? <textarea className="adm-input adm-textarea" dir="rtl" rows={3} value={urVal || ''} onChange={e => setText('ur', path, e.target.value)} />
+            : <input className="adm-input" dir="rtl" value={urVal || ''} onChange={e => setText('ur', path, e.target.value)} />}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderObject = (label, path, enObj, urObj, depth) => {
+    const keys = Object.keys(enObj).filter(k => !isFunction(enObj[k]));
+    return (
+      <div className="adm-text-group" key={path || 'root'}>
+        {label && <div className="adm-text-group-title">{label}</div>}
+        <div className="adm-text-group-body">
+          {keys.map(k => renderField(k, path ? `${path}.${k}` : k, enObj[k], urObj && urObj[k], depth + 1))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderArray = (label, path, enArr, urArr) => {
+    if (!enArr.length) return null;
+    const firstIsObject = isObject(enArr[0]);
+    return (
+      <div className="adm-text-group" key={path}>
+        <div className="adm-text-group-title">{label} <em>(list — {enArr.length})</em></div>
+        <div className="adm-text-group-body">
+          {enArr.map((item, i) => {
+            const subPath = `${path}.${i}`;
+            if (firstIsObject) {
+              const updateItem = (lang, patchObj) => {
+                const srcArr = lang === 'en' ? enArr : (urArr || enArr);
+                const copy = srcArr.map((e, k) => (k === i ? { ...(e || {}), ...patchObj } : e));
+                setText(lang, path, copy);
+              };
+              const removeItem = () => {
+                const na = enArr.filter((_, k) => k !== i);
+                const ua = (urArr || []).filter((_, k) => k !== i);
+                setText('en', path, na); setText('ur', path, ua);
+              };
+              return (
+                <div className="adm-text-subgroup" key={subPath}>
+                  <div className="adm-text-subgroup-title">
+                    {label} #{i + 1}
+                    <button className="adm-icon-btn adm-icon-danger adm-text-del" title="Remove" onClick={removeItem}>✕</button>
+                  </div>
+                  {Object.keys(item).filter(k => !isFunction(item[k])).map(k => {
+                    const enVal = item[k];
+                    const urVal = urArr && urArr[i] && urArr[i][k];
+                    const innerPath = `${subPath}.${k}`;
+                    if (isString(enVal)) return renderString(k, innerPath, enVal, urVal, k.toLowerCase().includes('desc') || k.toLowerCase().includes('bio') || k.toLowerCase().includes('text'));
+                    if (isNumber(enVal)) {
+                      return (
+                        <div className="adm-text-row" key={innerPath}>
+                          <span className="adm-text-label">{k}</span>
+                          <div className="adm-text-inputs">
+                            <input className="adm-input" type="number" value={enVal ?? 0}
+                              onChange={e => updateItem('en', { [k]: Number(e.target.value) })} />
+                            <input className="adm-input" type="number" value={(urVal ?? enVal) ?? 0}
+                              onChange={e => updateItem('ur', { [k]: Number(e.target.value) })} />
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              );
+            }
+            return (
+              <div className="adm-text-subgroup" key={subPath}>
+                <div className="adm-text-subgroup-title">
+                  {label} #{i + 1}
+                  <button
+                    className="adm-icon-btn adm-icon-danger adm-text-del"
+                    title="Remove"
+                    onClick={() => {
+                      const na = enArr.filter((_, k) => k !== i);
+                      const ua = (urArr || []).filter((_, k) => k !== i);
+                      setText('en', path, na); setText('ur', path, ua);
+                    }}
+                  >✕</button>
+                </div>
+                <div className="adm-text-row">
+                  <span className="adm-text-label">Text — EN</span>
+                  <div className="adm-text-inputs">
+                    <input className="adm-input" value={enArr[i] || ''}
+                      onChange={e => setText('en', path, enArr.map((x, k) => (k === i ? e.target.value : x)))} />
+                  </div>
+                </div>
+                <div className="adm-text-row">
+                  <span className="adm-text-label">Text — UR</span>
+                  <div className="adm-text-inputs">
+                    <input className="adm-input" dir="rtl" value={(urArr && urArr[i]) || ''}
+                      onChange={e => setText('ur', path, (urArr || []).map((x, k) => (k === i ? e.target.value : x)))} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderField = (label, path, enVal, urVal, depth) => {
+    if (isString(enVal)) return renderString(label, path, enVal, urVal, label.toLowerCase().includes('desc') || label.toLowerCase().includes('bio') || label.toLowerCase().includes('text') || label.toLowerCase().includes('subtitle'));
+    if (isNumber(enVal)) {
+      return (
+        <div className="adm-text-row" key={path}>
+          <span className="adm-text-label">{label}</span>
+          <div className="adm-text-inputs">
+            <input className="adm-input" type="number" value={enVal ?? 0} onChange={e => setText('en', path, Number(e.target.value))} />
+            <input className="adm-input" type="number" value={(urVal ?? enVal) ?? 0} onChange={e => setText('ur', path, Number(e.target.value))} />
+          </div>
+        </div>
+      );
+    }
+    if (Array.isArray(enVal)) return renderArray(label, path, enVal, urVal);
+    if (isObject(enVal)) return renderObject(label, path, enVal, urVal, depth);
+    return null;
+  };
+
+  const groups = TEXT_ORDER.filter(g => enMerged[g] && isObject(enMerged[g]) && !isFunction(enMerged[g]) && !Array.isArray(enMerged[g]));
+
+  return (
+    <div className="adm-text-editor">
+      <div className="adm-toolbar">
+        <div>
+          <h2 className="adm-section-title">✍️ Edit All Website Text</h2>
+          <p className="adm-sub">Every heading, paragraph and button on the website — in English and Urdu. Changes appear immediately after saving.</p>
+        </div>
+        <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>{busy ? 'Saving…' : '💾 Save All Text'}</button>
+      </div>
+
+      <div className="adm-text-tabs">
+        {groups.map(g => (
+          <button key={g} className={`adm-text-tab${openTextGroup === g ? ' active' : ''}`}
+            onClick={() => setOpenTextGroup(o => o === g ? null : g)}>
+            {GROUP_LABELS[g] || g}
+          </button>
+        ))}
+      </div>
+
+      {groups.map(g => (
+        <div key={g} className={`adm-text-group-card${openTextGroup === g ? ' open' : ''}`}>
+          <div className="adm-text-group-card-title" onClick={() => setOpenTextGroup(o => o === g ? null : g)}>
+            <span>{GROUP_LABELS[g] || g}</span>
+            <span className="adm-text-group-chevron">{openTextGroup === g ? '▲' : '▼'}</span>
+          </div>
+          {openTextGroup === g && (
+            <div className="adm-text-group-card-body">
+              {renderObject('', g, enMerged[g], urMerged[g], 0)}
+            </div>
+          )}
+        </div>
+      ))}
+
+      <div style={{ textAlign: 'center', marginTop: 20 }}>
+        <button className="adm-btn adm-btn-primary" style={{ padding: '14px 48px', fontSize: '1rem' }} disabled={busy} onClick={onSave}>
+          {busy ? 'Saving…' : '💾 Save All Text'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function isFunction(v) { return typeof v === 'function'; }
+
+/* ============================================================
+   SECTIONS EDITOR — show/hide + reorder homepage sections
+   ============================================================ */
+function SectionsEditor({ content, setContent, busy, onSave }) {
+  const sections = content.sections || [];
+
+  const toggle = i => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.sections[i].enabled = !next.sections[i].enabled;
+      return next;
+    });
+  };
+
+  const move = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= sections.length) return;
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const arr = next.sections;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      return next;
+    });
+  };
+
+  return (
+    <div className="adm-sections">
+      <div className="adm-toolbar">
+        <div>
+          <h2 className="adm-section-title">🧩 Homepage Sections</h2>
+          <p className="adm-sub">Toggle sections on/off and change their order on the homepage.</p>
+        </div>
+        <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>{busy ? 'Saving…' : '💾 Save Sections'}</button>
+      </div>
+
+      <div className="adm-section-list">
+        {sections.map((s, i) => (
+          <div className={`adm-section-row${s.enabled === false ? ' off' : ''}`} key={s.key}>
+            <button className="adm-icon-btn adm-section-move" title="Move up" disabled={i === 0} onClick={() => move(i, -1)}>↑</button>
+            <button className="adm-icon-btn adm-section-move" title="Move down" disabled={i === sections.length - 1} onClick={() => move(i, 1)}>↓</button>
+            <span className="adm-section-index">{i + 1}</span>
+            <span className="adm-section-name">{s.label} <em>({s.key})</em></span>
+            <button className={`adm-toggle${s.enabled === false ? ' off' : ''}`} onClick={() => toggle(i)}>
+              {s.enabled === false ? 'Hidden' : 'Visible'}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <p className="adm-sub" style={{ marginTop: 14 }}>Note: the hero is always first (followed by the marquee ticker). Footer & floating buttons always stay.</p>
+    </div>
+  );
+}
+
+/* ============================================================
+   THEME EDITOR — colors for the whole site
+   ============================================================ */
+const THEME_KEYS = [
+  ['crimson', 'Primary Red'],
+  ['crimsonDark', 'Primary Red (dark)'],
+  ['crimsonDeep', 'Primary Red (deep)'],
+  ['crimsonLight', 'Primary Red (light)'],
+  ['gold', 'Gold'],
+  ['goldBright', 'Gold (bright)'],
+  ['goldPale', 'Gold (pale)'],
+  ['goldGlow', 'Gold (glow)'],
+  ['surface', 'Background'],
+  ['surface2', 'Background (alt)'],
+  ['card', 'Card background'],
+  ['text', 'Text color'],
+  ['textMuted', 'Muted text'],
+  ['ink', 'Dark ink'],
+  ['inkMid', 'Dark ink (mid)'],
+  ['accent', 'Accent background'],
+];
+
+function ThemeEditor({ content, setContent, busy, onSave }) {
+  const theme = content.theme || {};
+
+  const set = (key, value) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.theme[key] = value;
+      return next;
+    });
+  };
+
+  const preview = {
+    primary: theme.crimson || '#B91C1C',
+    gold: theme.gold || '#D97706',
+    surface: theme.surface || '#FAF7F7',
+    card: theme.card || '#FFFFFF',
+    text: theme.text || '#1F1717',
+  };
+
+  return (
+    <div className="adm-theme">
+      <div className="adm-toolbar">
+        <div>
+          <h2 className="adm-section-title">🎨 Website Theme Colors</h2>
+          <p className="adm-sub">Change the site's colors. Saving applies them to the whole website instantly.</p>
+        </div>
+        <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>{busy ? 'Saving…' : '💾 Save Theme'}</button>
+      </div>
+
+      <div className="adm-theme-live">
+        <div className="adm-theme-live-bar" style={{ background: `linear-gradient(90deg, ${preview.primary}, ${preview.gold})` }} />
+        <div className="adm-theme-live-demo" style={{ background: preview.surface }}>
+          <span style={{ background: preview.card, color: preview.text, borderColor: preview.primary }}>
+            <b style={{ color: preview.primary }}>Live preview</b> — this is how colors will look.
+          </span>
+        </div>
+      </div>
+
+      <div className="adm-theme-grid">
+        {THEME_KEYS.map(([key, label]) => (
+          <label className="adm-theme-field" key={key}>
+            <span>{label}</span>
+            <div className="adm-theme-control">
+              <input type="color" value={theme[key] || '#000000'} onChange={e => set(key, e.target.value)} />
+              <input className="adm-input adm-input-mono" value={theme[key] || ''} onChange={e => set(key, e.target.value)} />
+            </div>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   STORIES EDITOR — success stories with photos
+   ============================================================ */
+function StoriesEditor({ content, setContent, busy, onSave, api }) {
+  const items = content.stories?.items || [];
+
+  const patchItem = (i, patch) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.stories.items[i] = { ...next.stories.items[i], ...patch };
+      return next;
+    });
+  };
+
+  const addItem = () => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.stories.items = [...next.stories.items, { titleEn: '', titleUr: '', textEn: '', textUr: '', img: '' }];
+      return next;
+    });
+  };
+
+  const removeItem = i => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.stories.items = next.stories.items.filter((_, idx) => idx !== i);
+      return next;
+    });
+  };
+
+  const moveItem = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= items.length) return;
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const arr = next.stories.items;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      return next;
+    });
+  };
+
+  const pickImg = async (i, e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const file = await readFileAsBase64(f);
+    try {
+      const up = await api('/api/admin/upload', {
+        folder: 'stories',
+        filename: `story-${Date.now()}.${file.ext}`,
+        ext: file.ext,
+        data: file.data,
+      }, 'POST');
+      patchItem(i, { img: up.src });
+    } catch (err) { alert(err.message); }
+    e.target.value = '';
+  };
+
+  return (
+    <div className="adm-stories">
+      <div className="adm-toolbar">
+        <div>
+          <h2 className="adm-section-title">📖 Success Stories</h2>
+          <p className="adm-sub">The story cards shown on the homepage. Each has a photo plus text in English and Urdu.</p>
+        </div>
+        <button className="adm-btn adm-btn-outline" disabled={busy} onClick={addItem}>+ Add Story</button>
+        <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>{busy ? 'Saving…' : '💾 Save Stories'}</button>
+      </div>
+
+      {items.length === 0 && <p className="adm-empty">No stories yet. Click "+ Add Story" to add the first one.</p>}
+
+      {items.map((it, i) => (
+        <div className="adm-story" key={i}>
+          <div className="adm-story-head">
+            <span className="adm-story-num">Story #{i + 1}</span>
+            <div className="adm-story-actions">
+              <button className="adm-icon-btn" disabled={i === 0} onClick={() => moveItem(i, -1)}>↑</button>
+              <button className="adm-icon-btn" disabled={i === items.length - 1} onClick={() => moveItem(i, 1)}>↓</button>
+              <button className="adm-icon-btn adm-icon-danger" onClick={() => removeItem(i)}>✕</button>
+            </div>
+          </div>
+          <div className="adm-story-body">
+            <div className="adm-story-media">
+              {it.img ? (
+                <img src={it.img} alt="" className="adm-story-img" onError={e => { e.currentTarget.style.opacity = '0.25'; }} />
+              ) : (
+                <div className="adm-editor-drop"><span className="adm-editor-drop-icon">📖</span><span>No photo</span></div>
+              )}
+              <label className="adm-btn adm-btn-outline adm-upload-label">
+                {busy ? 'Uploading…' : '📷 Upload Photo'}
+                <input type="file" accept="image/*" disabled={busy} onChange={e => pickImg(i, e)} />
+              </label>
+            </div>
+            <div className="adm-story-fields">
+              <div className="adm-story-field">
+                <span>Title — EN</span>
+                <input className="adm-input" value={it.titleEn || ''} onChange={e => patchItem(i, { titleEn: e.target.value })} />
+              </div>
+              <div className="adm-story-field">
+                <span>Title — UR</span>
+                <input className="adm-input" dir="rtl" value={it.titleUr || ''} onChange={e => patchItem(i, { titleUr: e.target.value })} />
+              </div>
+              <div className="adm-story-field">
+                <span>Text — EN</span>
+                <textarea className="adm-input adm-textarea" rows={3} value={it.textEn || ''} onChange={e => patchItem(i, { textEn: e.target.value })} />
+              </div>
+              <div className="adm-story-field">
+                <span>Text — UR</span>
+                <textarea className="adm-input adm-textarea" dir="rtl" rows={3} value={it.textUr || ''} onChange={e => patchItem(i, { textUr: e.target.value })} />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ============================================================
+   BUILDING EDITOR — progress bars, budget, facilities, milestones
+   ============================================================ */
+function BuildingEditor({ content, setContent, busy, onSave, api }) {
+  const b = content.building || {};
+
+  const patch = (key, value) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.building[key] = value;
+      return next;
+    });
+  };
+
+  const patchBar = (i, patchObj) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.building.bars[i] = { ...next.building.bars[i], ...patchObj };
+      return next;
+    });
+  };
+
+  const patchBudget = (i, patchObj) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.building.budget[i] = { ...next.building.budget[i], ...patchObj };
+      return next;
+    });
+};
+
+  const patchCItem = (i, patchObj) => {
+    setContent(prev => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next.construction.items[i] = { ...next.construction.items[i], ...patchObj };
+      return next;
+    });
+  };
+
+  const pickImage = async e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const file = await readFileAsBase64(f);
+    try {
+      const up = await api('/api/admin/upload', {
+        folder: 'site-images',
+        filename: `building-${Date.now()}.${file.ext}`,
+        ext: file.ext,
+        data: file.data,
+      }, 'POST');
+      patch('image', up.src);
+    } catch (err) { alert(err.message); }
+    e.target.value = '';
+  };
+
+  const bars = b.bars || [];
+  const budget = b.budget || [];
+  const cItems = content.construction?.items || [];
+  const facilities = b.facilities || { en: [], ur: [] };
+
+  return (
+    <div className="adm-building">
+      <div className="adm-toolbar">
+        <div>
+          <h2 className="adm-section-title">🏗️ Building & Construction</h2>
+          <p className="adm-sub">Progress bars, budget numbers, planned facilities and construction milestones shown in the Building section.</p>
+        </div>
+        <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>{busy ? 'Saving…' : '💾 Save Building'}</button>
+      </div>
+
+      {/* Building image */}
+      <div className="adm-content-section">
+        <h3 className="adm-content-section-title">Building Photo</h3>
+        <div className="adm-story-media">
+          {b.image ? <img src={b.image} alt="" className="adm-story-img" /> : null}
+          <label className="adm-btn adm-btn-outline adm-upload-label">
+            {busy ? 'Uploading…' : '📷 Change Building Photo'}
+            <input type="file" accept="image/*" disabled={busy} onChange={pickImage} />
+          </label>
+        </div>
+      </div>
+
+      {/* Progress bars */}
+      <div className="adm-content-section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <h3 className="adm-content-section-title" style={{ marginBottom: 0 }}>📊 Progress Bars</h3>
+          <button className="adm-btn adm-btn-outline" onClick={() => patch('bars', [...bars, { en: '', ur: '', target: 0 }])}>+ Add Bar</button>
+        </div>
+        {bars.map((bar, i) => (
+          <div className="adm-building-bar" key={i}>
+            <input className="adm-input" placeholder="Label EN" value={bar.en || ''} onChange={e => patchBar(i, { en: e.target.value })} />
+            <input className="adm-input" dir="rtl" placeholder="Label UR" value={bar.ur || ''} onChange={e => patchBar(i, { ur: e.target.value })} />
+            <input className="adm-input" type="number" min="0" max="100" placeholder="%" value={bar.target ?? 0} onChange={e => patchBar(i, { target: Number(e.target.value) })} />
+            <button className="adm-icon-btn adm-icon-danger" onClick={() => patch('bars', bars.filter((_, idx) => idx !== i))}>✕</button>
+          </div>
+        ))}
+      </div>
+
+      {/* Budget */}
+      <div className="adm-content-section">
+        <h3 className="adm-content-section-title">💰 Budget Numbers</h3>
+        {budget.map((item, i) => (
+          <div className="adm-building-bar" key={i}>
+            <input className="adm-input" placeholder="Label EN" value={item.en || ''} onChange={e => patchBudget(i, { en: e.target.value })} />
+            <input className="adm-input" dir="rtl" placeholder="Label UR" value={item.ur || ''} onChange={e => patchBudget(i, { ur: e.target.value })} />
+            <input className="adm-input adm-input-mono" placeholder="Value e.g. PKR 45.5M" value={item.value || ''} onChange={e => patchBudget(i, { value: e.target.value })} />
+            <button className="adm-icon-btn adm-icon-danger" onClick={() => patch('budget', budget.filter((_, idx) => idx !== i))}>✕</button>
+          </div>
+        ))}
+      </div>
+
+      {/* Facilities */}
+      <div className="adm-content-section">
+        <h3 className="adm-content-section-title">🏠 Planned Facilities</h3>
+        <div className="adm-content-grid">
+          <label className="adm-field">
+            <span>Facilities — EN (one per line)</span>
+            <textarea className="adm-input adm-textarea" rows={6} value={facilities.en.join('\n')}
+              onChange={e => patch('facilities', { ...facilities, en: e.target.value.split('\n') })} />
+          </label>
+          <label className="adm-field">
+            <span>Facilities — UR (one per line)</span>
+            <textarea className="adm-input adm-textarea" dir="rtl" rows={6} value={facilities.ur.join('\n')}
+              onChange={e => patch('facilities', { ...facilities, ur: e.target.value.split('\n') })} />
+          </label>
+        </div>
+      </div>
+
+      {/* Construction milestones */}
+      <div className="adm-content-section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <h3 className="adm-content-section-title" style={{ marginBottom: 0 }}>🏁 Construction Milestones</h3>
+          <button className="adm-btn adm-btn-outline" onClick={() => setContent(prev => { const next = JSON.parse(JSON.stringify(prev)); next.construction.items = [...next.construction.items, { labelEn: '', labelUr: '', statusEn: 'Completed', statusUr: 'مکمل' }]; return next; })}>+ Add Milestone</button>
+        </div>
+        {cItems.map((item, i) => (
+          <div className="adm-building-bar adm-building-bar-col" key={i}>
+            <div className="adm-building-pair">
+              <input className="adm-input" placeholder="Milestone EN" value={item.labelEn || ''} onChange={e => patchCItem(i, { labelEn: e.target.value })} />
+              <input className="adm-input" dir="rtl" placeholder="Milestone UR" value={item.labelUr || ''} onChange={e => patchCItem(i, { labelUr: e.target.value })} />
+            </div>
+            <div className="adm-building-pair">
+              <input className="adm-input" placeholder="Status EN e.g. Completed" value={item.statusEn || ''} onChange={e => patchCItem(i, { statusEn: e.target.value })} />
+              <input className="adm-input" dir="rtl" placeholder="Status UR" value={item.statusUr || ''} onChange={e => patchCItem(i, { statusUr: e.target.value })} />
+            </div>
+            <button className="adm-icon-btn adm-icon-danger" onClick={() => setContent(prev => { const next = JSON.parse(JSON.stringify(prev)); next.construction.items = next.construction.items.filter((_, idx) => idx !== i); return next; })}>✕</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    CONTENT EDITOR — Full control over website text/data
    ============================================================ */
 function ContentEditor({ content, setContent, busy, onSave }) {
@@ -765,7 +1575,7 @@ function ContentEditor({ content, setContent, busy, onSave }) {
     <div className="adm-content-editor">
       <div className="adm-toolbar">
         <div>
-          <h2 className="adm-section-title">✏️ Website Content Editor</h2>
+          <h2 className="adm-section-title">📞 Contact, Donation & Hero Stats</h2>
           <p className="adm-sub">Edit stats, bank details, phone numbers &amp; contact info. Changes appear on the website after saving.</p>
         </div>
         <button className="adm-btn adm-btn-primary" disabled={busy} onClick={onSave}>

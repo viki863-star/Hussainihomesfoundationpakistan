@@ -1,36 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLang } from '../LangContext';
 import { withBase } from '../paths';
+import { useContent } from '../useContent';
+import { useInView } from '../useInView';
 
 function AnimatedBar({ label, target, color, delay = 0 }) {
   const [width, setWidth] = useState(0);
   const [count, setCount] = useState(0);
-  const ref = useRef(null);
+  const [ref, inView] = useInView({ threshold: 0.3, once: true });
   const animated = useRef(false);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !animated.current) {
-        animated.current = true;
-        setTimeout(() => {
-          setWidth(target);
-          const dur = 1600;
-          const start = performance.now();
-          const step = now => {
-            const p = Math.min((now - start) / dur, 1);
-            const eased = 1 - Math.pow(1 - p, 3);
-            setCount(Math.floor(eased * target));
-            if (p < 1) requestAnimationFrame(step);
-          };
-          requestAnimationFrame(step);
-        }, delay);
-      }
-    }, { threshold: 0.3 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [target, delay]);
+    if (!inView || animated.current) return;
+    animated.current = true;
+    setTimeout(() => {
+      setWidth(target);
+      const dur = 1600;
+      const start = performance.now();
+      const step = now => {
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setCount(Math.floor(eased * target));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }, delay);
+  }, [inView, target, delay]);
 
   return (
     <div className="progress-item stagger-item" ref={ref}>
@@ -56,27 +51,46 @@ function AnimatedBar({ label, target, color, delay = 0 }) {
 
 export default function BuildingProgress() {
   const { t, isUrdu } = useLang();
+  const content = useContent();
   const b = t.building;
+  const cfg = (content && content.building) || {};
+  const lang = isUrdu ? 'ur' : 'en';
 
-  const bars = [
-    { label: b.bars[0], target: 100, color: '#EF4444', delay: 0 },
-    { label: b.bars[1], target: 100, color: '#EF4444', delay: 200 },
-    { label: b.bars[2], target: 100, color: '#F59E0B', delay: 400 },
-    { label: b.bars[3], target: 0,   color: '#6B7280', delay: 600 },
-    { label: b.bars[4], target: 10,  color: '#FBBF24', delay: 800 },
-  ];
+  const barColors = ['#EF4444', '#EF4444', '#F59E0B', '#6B7280', '#FBBF24'];
+  const cfgBars = cfg.bars && cfg.bars.length ? cfg.bars : [];
+  const bars = (cfgBars.length ? cfgBars : b.bars.map((label, i) => ({ en: label, ur: b.bars[i], target: [100, 100, 100, 0, 10][i] || 0 })))
+    .map((bar, i) => ({
+      label: bar[lang] || bar.en || b.bars[i],
+      target: Number(bar.target ?? 0),
+      color: barColors[i % barColors.length],
+      delay: i * 200,
+    }));
 
-  const facilities = b.facilityList;
+  const cfgBudget = cfg.budget && cfg.budget.length ? cfg.budget : [];
+  const budget = (cfgBudget.length ? cfgBudget : [
+    { en: b.totalBudget, ur: b.totalBudget, value: 'PKR 45.5M' },
+    { en: b.invested, ur: b.invested, value: 'PKR 13M' },
+    { en: b.monthlyCost, ur: b.monthlyCost, value: 'PKR 300K' },
+  ]).map((item, i) => ({
+    label: item[lang] || item.en || b.totalBudget,
+    value: item.value || '',
+    color: i === 0 ? 'var(--text)' : (i === 1 ? 'var(--crimson-light)' : 'var(--gold)'),
+  }));
+
+  const cfgFacilities = (cfg.facilities && cfg.facilities[lang]) || [];
+  const facilities = cfgFacilities.length ? cfgFacilities : b.facilityList;
+
+  const imageSrc = withBase(cfg.image || '/images/Bulding Pic 2.jpeg');
 
   return (
-    <section className="section building-section" id="building" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <section className="section building-section" id="building" dir={isUrdu ? 'rtl' : 'ltr'} aria-labelledby="building-title">
       <div className="container">
         {/* Section header */}
         <div className="text-center" style={{ marginBottom: 72 }}>
           <div className="section-eyebrow" style={{ justifyContent: 'center' }}>
             {b.eyebrow}
           </div>
-          <h2 className="section-title">{b.sectionTitle}</h2>
+          <h2 className="section-title" id="building-title">{b.sectionTitle}</h2>
           <p className="section-subtitle">{b.subtitle}</p>
         </div>
 
@@ -93,18 +107,12 @@ export default function BuildingProgress() {
             </div>
 
             <div className="budget-cards" style={{ marginTop: 36 }}>
-              <div className="budget-card">
-                <span className="budget-label">{b.totalBudget}</span>
-                <span className="budget-value">PKR 45.5M</span>
-              </div>
-              <div className="budget-card">
-                <span className="budget-label">{b.invested}</span>
-                <span className="budget-value" style={{ color: 'var(--crimson-light)' }}>PKR 13M</span>
-              </div>
-              <div className="budget-card">
-                <span className="budget-label">{b.monthlyCost}</span>
-                <span className="budget-value" style={{ color: 'var(--gold)' }}>PKR 300K</span>
-              </div>
+              {budget.map((item, i) => (
+                <div className="budget-card" key={i}>
+                  <span className="budget-label">{item.label}</span>
+                  <span className="budget-value" style={{ color: item.color }}>{item.value}</span>
+                </div>
+              ))}
             </div>
 
             <div style={{ marginTop: 32 }}>
@@ -118,7 +126,7 @@ export default function BuildingProgress() {
           <div className="reveal reveal-right">
             <img
               className="building-img-main"
-              src={withBase('/images/Bulding Pic 2.jpeg')}
+              src={imageSrc}
               alt="Building under construction"
               loading="lazy"
             />

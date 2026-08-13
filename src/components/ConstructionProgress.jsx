@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLang } from '../LangContext';
 import { useSiteImages } from '../siteImages';
+import { useContent } from '../useContent';
+import { useFocusTrap } from '../useFocusTrap';
 
 function ConstructionLightbox({ src, alt, onClose }) {
   const [zoomed, setZoomed] = useState(false);
+  const dialogRef = useRef(null);
+
+  useFocusTrap(dialogRef, true);
 
   useEffect(() => {
     const onKey = e => {
@@ -24,6 +29,7 @@ function ConstructionLightbox({ src, alt, onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label={alt}
+      ref={dialogRef}
     >
       <button className="clightbox-close" onClick={onClose} aria-label="Close">✕</button>
 
@@ -76,17 +82,29 @@ function CheckIcon() {
 export default function ConstructionProgress() {
   const { t, isUrdu } = useLang();
   const imgs = useSiteImages();
+  const content = useContent();
   const c = t.construction;
   const [open, setOpen] = useState(false);
 
+  const cfgItems = (content && content.construction && content.construction.items) || [];
+  const items = (cfgItems.length ? cfgItems : c.items.map(item => ({
+    labelEn: item.label,
+    labelUr: item.label,
+    statusEn: item.status,
+    statusUr: item.status,
+  }))).map(item => ({
+    label: item['label' + (isUrdu ? 'Ur' : 'En')] || item.labelEn || item.label || '',
+    status: item['status' + (isUrdu ? 'Ur' : 'En')] || item.statusEn || item.status || '',
+  }));
+
   return (
-    <section className="section construction-section" id="construction-progress" dir={isUrdu ? 'rtl' : 'ltr'}>
+    <section className="section construction-section" id="construction-progress" dir={isUrdu ? 'rtl' : 'ltr'} aria-labelledby="construction-title">
       <div className="container">
         <div className="text-center">
           <div className="section-eyebrow" style={{ justifyContent: 'center' }}>
             {c.eyebrow}
           </div>
-          <h2 className="section-title">{c.title}</h2>
+          <h2 className="section-title" id="construction-title">{c.title}</h2>
           <p className="section-subtitle">{c.subtitle}</p>
         </div>
       </div>
@@ -122,7 +140,7 @@ export default function ConstructionProgress() {
           <p className="construction-card-text">{c.cardText}</p>
 
           <ul className="construction-progress-list stagger-group">
-            {c.items.map((item, i) => (
+            {items.map((item, i) => (
               <li key={i} className="construction-progress-item stagger-item">
                 <span className="construction-check" aria-hidden="true">
                   <CheckIcon />

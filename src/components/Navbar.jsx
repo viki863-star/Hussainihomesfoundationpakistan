@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLang } from '../LangContext';
 import { useSiteImages } from '../siteImages';
+import { useFocusTrap } from '../useFocusTrap';
 
 function ThemeToggle({ isDark, onClick }) {
   return (
@@ -32,8 +33,26 @@ export default function Navbar({ activeSection = 'home' }) {
   const [scrolled, setScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [logoHovered, setLogoHovered] = useState(false);
+  const menuRef = useRef(null);
+  const toggleRef = useRef(null);
   const location = useLocation();
   const onHome = location.pathname === '/';
+
+  // Modal-style mobile menu: trap focus while open, Escape closes it,
+  // and focus returns to the toggle (handled inside useFocusTrap cleanup).
+  useFocusTrap(menuRef, open);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = e => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        if (toggleRef.current) toggleRef.current.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -99,8 +118,13 @@ export default function Navbar({ activeSection = 'home' }) {
             </div>
           </Link>
 
-          {/* ─── DESKTOP LINKS ─── */}
-          <ul className={`nav-links${open ? ' open' : ''}`}>
+          {/* ─── DESKTOP LINKS (mobile = fullscreen menu) ─── */}
+          <ul
+            className={`nav-links${open ? ' open' : ''}`}
+            ref={menuRef}
+            id="primary-nav"
+            aria-label="Main navigation"
+          >
             {navIds.map((id, i) => (
               <li key={id}>
                 <Link
@@ -139,17 +163,18 @@ export default function Navbar({ activeSection = 'home' }) {
               <span className="lang-pill-ur">اردو</span>
             </button>
 
-            {/* Hamburger */}
-            <div
+            {/* Hamburger — proper button with expanded state + connected target */}
+            <button
+              type="button"
+              ref={toggleRef}
               className={`nav-toggle${open ? ' open' : ''}`}
               onClick={() => setOpen(v => !v)}
-              aria-label="Toggle menu"
-              role="button"
-              tabIndex={0}
-              onKeyDown={e => e.key === 'Enter' && setOpen(v => !v)}
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-expanded={open}
+              aria-controls="primary-nav"
             >
               <span /><span /><span />
-            </div>
+            </button>
           </div>
 
         </div>

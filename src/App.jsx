@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { LangProvider } from './LangContext';
-import { fetchContent } from './useContent';
+import { fetchContent, useContent } from './useContent';
+import { observeInView } from './useInView';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -15,11 +16,14 @@ import SuccessStories from './components/SuccessStories';
 import Donate from './components/Donate';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import Admin from './components/Admin';
 import { useSiteImages } from './siteImages';
 import { withBase } from './paths';
 import './App.css';
 import './admin.css';
+
+// Admin panel is only needed by staff — load it lazily so visitors never
+// download the full site manager.
+const Admin = lazy(() => import('./components/Admin'));
 
 /* ---- Custom Cursor ---- */
 function CustomCursor() {
@@ -168,6 +172,31 @@ function BackToTop() {
   );
 }
 
+/* ---- Mobile bottom dock (Donate + WhatsApp) ----
+   Replaces the floating FABs on touch/small screens with a
+   full-width sticky action bar. Collapses to icon-only <480px. */
+function MobileDock({ donateLabel, whatsappLabel }) {
+  return (
+    <div className="mobile-dock" role="group" aria-label="Quick actions">
+      <a
+        className="dock-btn dock-btn-whatsapp"
+        href="https://wa.me/923034030009"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" width="24" height="24">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+        <span className="dock-btn-label">{whatsappLabel}</span>
+      </a>
+      <a className="dock-btn dock-btn-donate" href="#donate">
+        <span className="dock-btn-glyph" aria-hidden="true">♥</span>
+        <span className="dock-btn-label">{donateLabel}</span>
+      </a>
+    </div>
+  );
+}
+
 /* ---- Branded preloader ---- */
 function Preloader({ hidden }) {
   const [hide, setHide] = useState(false);
@@ -190,7 +219,10 @@ function Preloader({ hidden }) {
   );
 }
 
-/* ---- Logo intro (one shot per session) ---- */
+/* ---- Logo intro (one shot per browser, versioned so a future redesign
+   can force it again by bumping the key) ---- */
+const INTRO_KEY = 'hh_intro_v2';
+
 function IntroOverlay({ onDone }) {
   const [hiding, setHiding] = useState(false);
   const [off, setOff] = useState(false);
@@ -200,7 +232,7 @@ function IntroOverlay({ onDone }) {
     const inApp = /FBAN|FBAV|FB_IAB|fb_iab|Instagram|Messenger|FB4A/i.test(ua);
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (inApp || reduced) {
-      sessionStorage.setItem('hh_intro', '1');
+      localStorage.setItem(INTRO_KEY, '1');
       onDone();
       return;
     }
@@ -214,7 +246,7 @@ function IntroOverlay({ onDone }) {
 
   useEffect(() => {
     if (!off) return;
-    sessionStorage.setItem('hh_intro', '1');
+    localStorage.setItem(INTRO_KEY, '1');
     onDone();
   }, [off, onDone]);
 
@@ -238,45 +270,55 @@ function IntroOverlay({ onDone }) {
 /* ---- Scroll Animations ---- */
 function useScrollAnimations() {
   useEffect(() => {
-    const revealObs = new IntersectionObserver(
-      entries => entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          e.target.classList.add('just-revealed');
-          setTimeout(() => e.target.classList.remove('just-revealed'), 1200);
-        }
-      }),
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    );
-    const staggerObs = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
-    );
-    const titleObs = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.5 }
-    );
-    const counterObs = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('pop-in'); }),
-      { threshold: 0.6 }
-    );
-    const makeObs = (threshold, rootMargin) => new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold, rootMargin }
-    );
-    const fadeObs = makeObs(0.12, '0px 0px -60px 0px');
+    const makes = [];
+    makes.push(observeInView('.reveal', 'visible', { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }));
+    makes.push(observeInView('.stagger-group', 'visible', { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }));
+    makes.push(observeInView('.section-title', 'visible', { threshold: 0.5 }));
+    makes.push(observeInView('.section-fade-up, .section-fade-left, .section-fade-right, .section-scale-in', 'visible', { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }));
+    makes.push(observeInView('.surprise-number', 'pop-in', { threshold: 0.6 }));
 
-    document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
-    document.querySelectorAll('.stagger-group').forEach(el => staggerObs.observe(el));
-    document.querySelectorAll('.section-title').forEach(el => titleObs.observe(el));
-    document.querySelectorAll('.surprise-number').forEach(el => counterObs.observe(el));
-    document.querySelectorAll('.section-fade-up, .section-fade-left, .section-fade-right, .section-scale-in').forEach(el => fadeObs.observe(el));
-
-    return () => {
-      revealObs.disconnect(); staggerObs.disconnect();
-      titleObs.disconnect(); counterObs.disconnect(); fadeObs.disconnect();
-    };
+    return () => makes.forEach(o => o.disconnect());
   }, []);
+}
+
+/* ---- Theme Applier (admin theme colors) ---- */
+const THEME_VAR_MAP = {
+  crimson: '--crimson',
+  crimsonDark: '--crimson-dark',
+  crimsonDeep: '--crimson-deep',
+  crimsonLight: '--crimson-light',
+  gold: '--gold',
+  goldBright: '--gold-bright',
+  goldPale: '--gold-pale',
+  goldGlow: '--gold-glow',
+  surface: '--surface',
+  surface2: '--surface-2',
+  card: '--card',
+  text: '--text',
+  textMuted: '--text-muted',
+  ink: '--ink',
+  inkMid: '--ink-mid',
+  accent: '--accent',
+};
+
+function ThemeApplier() {
+  const content = useContent();
+  const theme = (content && content.theme) || {};
+  const themeVersion = Object.entries(theme).map(([k, v]) => `${k}=${v}`).join('&');
+
+  useEffect(() => {
+    const root = document.documentElement;
+    Object.entries(theme).forEach(([cssKey, val]) => {
+      const cssVar = THEME_VAR_MAP[cssKey];
+      if (cssVar && val) root.style.setProperty(cssVar, val);
+    });
+    root.style.setProperty('--primary', theme.crimson || 'var(--crimson)');
+    root.style.setProperty('--primary-dark', theme.crimsonDark || 'var(--crimson-dark)');
+    root.style.setProperty('--secondary', theme.goldBright || 'var(--gold-bright)');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeVersion]);
+
+  return null;
 }
 
 /* ---- Active Section Tracker ---- */
@@ -296,12 +338,28 @@ function useActiveSection() {
 /* ---- Home Page ---- */
 import { useLang } from './LangContext';
 
+const ALL_SECTIONS = {
+  hero: <Hero />,
+  about: <About />,
+  services: <Services />,
+  team: <Team />,
+  building: <BuildingProgress />,
+  construction: <ConstructionProgress />,
+  gallery: <Gallery />,
+  stories: <SuccessStories />,
+  donate: <Donate />,
+  contact: <Contact />,
+};
+
 function HomePage() {
-  const { t } = useLang();
+  const { t, marquee } = useLang();
+  const content = useContent();
   const activeSection = useActiveSection();
   useScrollAnimations();
-  const [introSeen, setIntroSeen] = useState(() => sessionStorage.getItem('hh_intro') === '1');
+  const [introSeen, setIntroSeen] = useState(() => localStorage.getItem(INTRO_KEY) === '1');
   const finishIntro = useCallback(() => setIntroSeen(true), []);
+
+  const sections = (content && content.sections) || [];
 
   useEffect(() => {
     const ua = navigator.userAgent || '';
@@ -316,24 +374,41 @@ function HomePage() {
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <CustomCursor />
       <Navbar activeSection={activeSection} />
-      <div id="main-content">
-        <Hero />
-        <MarqueeTicker items={t.marquee} />
-        <About />
-        <Services />
-        <Team />
-        <BuildingProgress />
-        <ConstructionProgress />
-        <Gallery />
-        <SuccessStories />
-        <Donate />
-        <Contact />
-      </div>
+      <main id="main-content">
+        {sections.length > 0
+          ? sections.filter(s => s && s.enabled !== false).reduce((acc, s) => {
+            const el = ALL_SECTIONS[s.key] || null;
+            if (el) {
+              acc.push(el);
+              if (s.key === 'hero') acc.push(<MarqueeTicker key="marquee" items={marquee} />);
+            }
+            return acc;
+          }, [])
+          : (
+            <>
+              <Hero />
+              <MarqueeTicker items={marquee} />
+              <About />
+              <Services />
+              <Team />
+              <BuildingProgress />
+              <ConstructionProgress />
+              <Gallery />
+              <SuccessStories />
+              <Donate />
+              <Contact />
+            </>
+          )}
+      </main>
       <Footer />
       <FloatingActions
         donateLabel={t.nav.donate.replace(/^\s*♥\s*/, '')}
         donateSub={t.nav.donateSub}
         whatsappSub={t.nav.whatsappSub}
+      />
+      <MobileDock
+        donateLabel={t.nav.donate.replace(/^\s*♥\s*/, '')}
+        whatsappLabel={t.nav.whatsappSub}
       />
       <BackToTop />
     </>
@@ -361,15 +436,25 @@ function RobotsMeta() {
   return null;
 }
 
+/* Fallback shown while the lazy admin chunk loads (matches admin.css spinner) */
+function AdminLoader() {
+  return (
+    <div className="adm-page adm-center">
+      <div className="adm-spinner" />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <LangProvider>
       <BrowserRouter basename={routerBasename()}>
         <RobotsMeta />
+        <ThemeApplier />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/team/:id" element={<TeamDetail />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<Suspense fallback={<AdminLoader />}><Admin /></Suspense>} />
         </Routes>
       </BrowserRouter>
     </LangProvider>
