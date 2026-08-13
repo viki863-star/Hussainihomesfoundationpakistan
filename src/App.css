@@ -443,17 +443,22 @@
 /* ============================================
    CINEMATIC HERO — mobile-first, full-screen
    ============================================ */
-.cine-hero {
+/* Scroll track — tall wrapper that gives the scroll-video journey its length.
+   The page scrolls normally; only this track's progress drives the video. */
+.cine-hero-track {
   position: relative;
+  height: 320vh;
+  background: var(--ink);
+}
+/* Sticky panel — pins the full-screen video while the track scrolls by. */
+.cine-hero {
+  position: sticky;
+  top: 0;
   height: 100svh;
   height: 100dvh;
   background: var(--ink);
   overflow: hidden;
-}
-.cine-viewport {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
+  isolation: isolate;
 }
 
 /* Stage */
@@ -915,6 +920,261 @@
   .cine-caption-index { font-size: 0.65rem; }
   .cine-indicator { bottom: 16px; right: 12px; }
 }
+
+/* ============================================
+   SCROLL-CONTROLLED VIDEO HERO — overlay + chrome
+   (progress is driven by Hero.jsx's rAF loop)
+   ============================================ */
+.cine-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.cine-video,
+.cine-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--ink);
+}
+
+/* Cinematic color grade — subtle S-curve contrast, rich saturate and a
+   warm-film tint so the footage reads like a finished production.
+   Kept gentle so building details and children's faces stay natural. */
+.cine-video,
+.cine-poster {
+  filter: saturate(1.14) contrast(1.07) brightness(1.02);
+}
+.cine-grade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 34%, rgba(255,178,64,0.16) 0%, transparent 52%),
+    radial-gradient(ellipse 100% 100% at 50% 78%, rgba(12,34,64,0.20) 0%, transparent 62%),
+    linear-gradient(to bottom, rgba(255,220,160,0.04), rgba(10,26,60,0.10) 55%, rgba(24,10,6,0.16));
+}
+
+/* Cinematic light sweep — a slow, gentle ray that glides across the frame
+   (decorative only; disabled for reduced motion). */
+.cine-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(115deg,
+    transparent 34%,
+    rgba(255,238,205,0.05) 46%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,238,205,0.05) 54%,
+    transparent 66%);
+  background-size: 300% 100%;
+  animation: cineSweep 11s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes cineSweep {
+  0%   { background-position: 130% 0; }
+  100% { background-position: -190% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cine-sweep { display: none; }
+}
+
+/* Scrim — keep text readable without covering the subject */
+.cine-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,
+      rgba(8,4,4,0.55) 0%,
+      rgba(8,4,4,0.06) 26%,
+      rgba(8,4,4,0.06) 48%,
+      rgba(8,4,4,0.74) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.noise-overlay { z-index: 1; }
+.cine-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 52%, rgba(6,3,3,0.55) 100%);
+  z-index: 1;
+}
+.cine-bottom-fade {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(to top, var(--ink), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Editorial copy (bottom-start; kept off the building/faces) ── */
+.cine-copy {
+  position: absolute;
+  bottom: clamp(84px, 13vh, 128px);
+  inset-inline-start: clamp(16px, 5vw, 80px);
+  inset-inline-end: clamp(16px, 5vw, 80px);
+  max-width: 660px;
+  z-index: 3;
+  pointer-events: none;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.85), 0 8px 48px rgba(0,0,0,0.55);
+}
+.cine-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold-glow);
+}
+.cine-eyebrow::after {
+  content: '';
+  width: 52px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-glow), transparent);
+}
+.cine-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5.2vw, 4.4rem);
+  font-weight: 900;
+  line-height: 1.06;
+  color: #fff;
+  max-width: 13em;
+  text-shadow: 0 3px 24px rgba(0,0,0,0.8), 0 0 60px rgba(251,191,36,0.16);
+}
+.cine-actions {
+  margin-top: 24px;
+  pointer-events: auto;
+}
+.cine-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 24px;
+  border-radius: 100px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+  box-shadow: 0 10px 32px rgba(185,28,28,0.45), inset 0 0 0 1px rgba(255,255,255,0.1);
+  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo);
+}
+.cine-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 44px rgba(185,28,28,0.55), inset 0 0 0 1px rgba(255,255,255,0.14);
+}
+.cine-cta-heart { animation: heartbeat 1.4s ease-in-out infinite; }
+
+/* ── Scroll hint (bottom-center; fades when the journey ends) ── */
+.cine-hint {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  pointer-events: none;
+  transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+}
+.cine-hero.ended .cine-hint {
+  opacity: 0;
+  transform: translateX(-50%) translateY(12px);
+}
+.hero-scroll-mouse {
+  width: 22px;
+  height: 36px;
+  border: 2px solid rgba(255,255,255,0.28);
+  border-radius: 100px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4px;
+}
+.hero-scroll-wheel {
+  width: 3px;
+  height: 7px;
+  background: var(--gold);
+  border-radius: 100px;
+  animation: scrollWheel 2s ease-in-out infinite;
+}
+.hero-scroll-text {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+/* ── Progress rail (inline-end) with a glowing "current frame" tip ── */
+.cine-rail {
+  position: absolute;
+  inset-inline-end: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 34vh;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.12);
+  z-index: 4;
+  pointer-events: none;
+}
+.cine-rail-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background: linear-gradient(to bottom, var(--gold-bright), var(--crimson));
+  transform: scaleY(0);
+  transform-origin: top;
+  will-change: transform;
+}
+.cine-rail-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold-glow);
+  box-shadow: 0 0 0 3px rgba(251,191,36,0.25), 0 0 18px rgba(251,191,36,0.9);
+  transform: translate(-50%, -50%);
+}
+
+/* ── Static (reduced-motion) variant ── */
+.cine-hero-static {
+  position: relative !important;
+  min-height: 100svh;
+  height: auto !important;
+}
+.cine-hero-static .cine-hint,
+.cine-hero-static .cine-rail { display: none !important; }
+
+/* ── Mobile — lighter chrome, shorter journey ── */
+@media (max-width: 767px) {
+  .cine-hero-track { height: 240vh; }
+  .cine-copy { bottom: clamp(96px, 15vh, 132px); }
+  .cine-title { font-size: clamp(1.7rem, 7.2vw, 2.6rem); }
+  .cine-hint { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .cine-rail { display: none; }
+}
+
 /* ============================================
    MARQUEE TICKER
    ============================================ */
