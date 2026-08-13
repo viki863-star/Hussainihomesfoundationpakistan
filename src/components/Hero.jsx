@@ -3,7 +3,6 @@ import { useLang } from '../LangContext';
 import { useSiteImages } from '../siteImages';
 import { useContent } from '../useContent';
 
-/* ─── Animated counter ─── */
 function useCountUp(target, duration = 2200, active = true) {
   const [count, setCount] = useState(0);
   const done = useRef(false);
@@ -34,7 +33,6 @@ function Stat({ number, label, prefix = '', suffix = '', active = true }) {
   );
 }
 
-/* ─── Main Cinematic Hero ─── */
 export default function Hero() {
   const { t, isUrdu } = useLang();
   const imgs = useSiteImages();
@@ -53,7 +51,6 @@ export default function Hero() {
   const hintRef = useRef(null);
 
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
   const [resolveActive, setResolveActive] = useState(false);
   const [resolveVisible, setResolveVisible] = useState(false);
 
@@ -64,9 +61,9 @@ export default function Hero() {
   const wheelAccum = useRef(0);
   const touchStartY = useRef(0);
   const touchStartTime = useRef(0);
+  const savedScrollY = useRef(0);
 
   useEffect(() => { currentFrameRef.current = currentFrame; }, [currentFrame]);
-  useEffect(() => { isLockedRef.current = isLocked; }, [isLocked]);
 
   const frames = [
     { src: imgs.heroFrameSide,     alt: 'Hussaini Homes building — side view',     cap: h.frame1 },
@@ -75,7 +72,6 @@ export default function Hero() {
     { src: imgs.heroFrameInterior, alt: 'Inside the Hussaini Homes building',      cap: h.frame4 },
   ];
 
-  /* ─── Preload first frame ─── */
   useEffect(() => {
     if (!imgs.heroFrameSide || reduced) return;
     const link = document.createElement('link');
@@ -87,7 +83,6 @@ export default function Hero() {
     return () => link.remove();
   }, [imgs.heroFrameSide, reduced]);
 
-  /* ─── Preload later frames ─── */
   useEffect(() => {
     if (reduced) return;
     const raf = requestAnimationFrame(() => {
@@ -101,28 +96,30 @@ export default function Hero() {
     return () => cancelAnimationFrame(raf);
   }, [reduced, imgs.heroFrameLeft, imgs.heroFrameFront, imgs.heroFrameInterior]);
 
-  /* ─── Lock / unlock body scroll ─── */
-  useEffect(() => {
-    if (isLocked) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    };
-  }, [isLocked]);
+  const lockBody = useCallback(() => {
+    savedScrollY.current = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${savedScrollY.current}px`;
+    document.body.style.width = '100%';
+    document.body.style.touchAction = 'none';
+  }, []);
 
-  /* ─── Advance / retreat frame ─── */
+  const unlockBody = useCallback(() => {
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    document.body.style.touchAction = '';
+    window.scrollTo(0, savedScrollY.current);
+  }, []);
+
   const advance = useCallback(() => {
     if (isAnimatingRef.current) return;
     const next = currentFrameRef.current + 1;
     if (next > 3) {
       isLockedRef.current = false;
-      setIsLocked(false);
+      unlockBody();
       setResolveVisible(true);
       setResolveActive(true);
       resolvedRef.current = true;
@@ -132,37 +129,51 @@ export default function Hero() {
     currentFrameRef.current = next;
     setCurrentFrame(next);
     setTimeout(() => { isAnimatingRef.current = false; }, 900);
-  }, []);
+  }, [unlockBody]);
 
   const retreat = useCallback(() => {
     if (isAnimatingRef.current) return;
     const prev = currentFrameRef.current - 1;
     if (prev < 0) {
       isLockedRef.current = false;
-      setIsLocked(false);
+      unlockBody();
       return;
     }
     isAnimatingRef.current = true;
     currentFrameRef.current = prev;
     setCurrentFrame(prev);
     setTimeout(() => { isAnimatingRef.current = false; }, 900);
-  }, []);
+  }, [unlockBody]);
 
-  /* ─── Wheel handler ─── */
+  const resolveScrollTo = useCallback((id) => {
+    isLockedRef.current = false;
+    unlockBody();
+    setResolveVisible(true);
+    setResolveActive(true);
+    resolvedRef.current = true;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }, [unlockBody]);
+
+  /* ─── Wheel handler (window-level) ─── */
   useEffect(() => {
     if (reduced) return;
-    const hero = heroRef.current;
-    if (!hero) return;
 
     const onWheel = (e) => {
-      const rect = hero.getBoundingClientRect();
-      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
-      if (!heroInView) return;
-
       if (!isLockedRef.current) {
+        const hero = heroRef.current;
+        if (!hero) return;
+        const rect = hero.getBoundingClientRect();
+        const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
+        if (!heroInView) return;
+
         e.preventDefault();
         isLockedRef.current = true;
-        setIsLocked(true);
+        lockBody();
         return;
       }
 
@@ -180,17 +191,17 @@ export default function Hero() {
       }
     };
 
-    hero.addEventListener('wheel', onWheel, { passive: false });
-    return () => hero.removeEventListener('wheel', onWheel);
-  }, [reduced, advance, retreat]);
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
+  }, [reduced, advance, retreat, lockBody]);
 
-  /* ─── Touch handler ─── */
+  /* ─── Touch handler (window-level) ─── */
   useEffect(() => {
     if (reduced) return;
-    const hero = heroRef.current;
-    if (!hero) return;
 
     const onTouchStart = (e) => {
+      const hero = heroRef.current;
+      if (!hero) return;
       const rect = hero.getBoundingClientRect();
       const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
       if (!heroInView) return;
@@ -200,7 +211,7 @@ export default function Hero() {
 
       if (!isLockedRef.current) {
         isLockedRef.current = true;
-        setIsLocked(true);
+        lockBody();
       }
     };
 
@@ -225,23 +236,23 @@ export default function Hero() {
       touchStartY.current = 0;
     };
 
-    hero.addEventListener('touchstart', onTouchStart, { passive: true });
-    hero.addEventListener('touchmove', onTouchMove, { passive: false });
-    hero.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
     return () => {
-      hero.removeEventListener('touchstart', onTouchStart);
-      hero.removeEventListener('touchmove', onTouchMove);
-      hero.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [reduced, advance, retreat]);
+  }, [reduced, advance, retreat, lockBody]);
 
   /* ─── Keyboard handler ─── */
   useEffect(() => {
     if (reduced) return;
-    const hero = heroRef.current;
-    if (!hero) return;
 
     const onKeyDown = (e) => {
+      const hero = heroRef.current;
+      if (!hero) return;
       const rect = hero.getBoundingClientRect();
       const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
       if (!heroInView) return;
@@ -250,7 +261,7 @@ export default function Hero() {
         if (e.key === 'ArrowDown' || e.key === ' ') {
           e.preventDefault();
           isLockedRef.current = true;
-          setIsLocked(true);
+          lockBody();
         }
         return;
       }
@@ -266,7 +277,7 @@ export default function Hero() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [reduced, advance, retreat]);
+  }, [reduced, advance, retreat, lockBody]);
 
   /* ─── Resolution panel animation ─── */
   useEffect(() => {
@@ -282,7 +293,7 @@ export default function Hero() {
     });
   }, [resolveVisible]);
 
-  /* ─── Rail fill animation ─── */
+  /* ─── Rail fill ─── */
   useEffect(() => {
     if (!railFillRef.current) return;
     const p = (currentFrame + (resolveVisible ? 1 : 0)) / 4;
@@ -290,20 +301,6 @@ export default function Hero() {
   }, [currentFrame, resolveVisible]);
 
   const dir = isUrdu ? 'rtl' : 'ltr';
-
-  const resolveScrollTo = useCallback((id) => {
-    isLockedRef.current = false;
-    setIsLocked(false);
-    setResolveVisible(true);
-    setResolveActive(true);
-    resolvedRef.current = true;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-  }, []);
 
   const resolution = (
     <div className="cine-resolve" ref={resolveRef} style={resolveVisible ? undefined : { opacity: 0, pointerEvents: 'none' }}>
@@ -338,7 +335,6 @@ export default function Hero() {
     </div>
   );
 
-  /* ── Reduced motion: calm static composition ── */
   if (reduced) {
     return (
       <section className="cine-hero cine-hero-static" id="home" ref={heroRef} aria-labelledby="hero-title">
@@ -354,7 +350,7 @@ export default function Hero() {
   }
 
   return (
-    <section className={`cine-hero${isLocked ? ' cine-locked' : ''}`} id="home" ref={heroRef} aria-labelledby="hero-title">
+    <section className="cine-hero" id="home" ref={heroRef} aria-labelledby="hero-title">
       <div className="cine-viewport">
         <div className="cine-stage" style={{ direction: dir }}>
           {frames.map((f, i) => (
@@ -386,19 +382,16 @@ export default function Hero() {
           <div className="cine-bottom-fade" aria-hidden="true" />
         </div>
 
-        {/* Scroll progress rail */}
         <div className="cine-rail" aria-hidden="true">
           <span className="cine-rail-fill" ref={railFillRef} />
         </div>
 
-        {/* Scroll hint */}
-        <div className="cine-hint" ref={hintRef} aria-hidden="true" style={{ opacity: currentFrame === 0 && !isLocked ? 1 : 0 }}>
+        <div className="cine-hint" ref={hintRef} aria-hidden="true" style={{ opacity: currentFrame === 0 ? 1 : 0 }}>
           <div className="hero-scroll-mouse"><div className="hero-scroll-wheel" /></div>
           <span className="hero-scroll-text">{h.scroll}</span>
           <span className="cine-hint-line" />
         </div>
 
-        {/* Frame indicator */}
         <div className="cine-indicator" aria-hidden="true">
           <span className={`cine-indicator-dot${currentFrame === 0 ? ' active' : ''}`} />
           <span className={`cine-indicator-dot${currentFrame === 1 ? ' active' : ''}`} />
