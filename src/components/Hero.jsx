@@ -33,6 +33,14 @@ function Stat({ number, label, prefix = '', suffix = '', active = true }) {
   );
 }
 
+/* Unique entrance animation per frame */
+const FRAME_ANIM = {
+  0: { name: 'slide-left',  dur: 1000 },
+  1: { name: 'slide-up',    dur: 1000 },
+  2: { name: 'zoom-in',     dur: 1000 },
+  3: { name: 'iris-wipe',   dur: 1200 },
+};
+
 export default function Hero() {
   const { t, isUrdu } = useLang();
   const imgs = useSiteImages();
@@ -49,6 +57,7 @@ export default function Hero() {
   const resolveRef = useRef(null);
   const railFillRef = useRef(null);
   const hintRef = useRef(null);
+  const frameRefs = useRef([]);
 
   const [currentFrame, setCurrentFrame] = useState(0);
   const [resolveActive, setResolveActive] = useState(false);
@@ -125,7 +134,7 @@ export default function Hero() {
       setResolveVisible(true);
       setResolveActive(true);
       resolvedRef.current = true;
-      window.scrollBy({ top: 200, behavior: 'smooth' });
+      window.scrollBy({ top: 180, behavior: 'smooth' });
       return;
     }
     isAnimatingRef.current = true;
@@ -139,6 +148,7 @@ export default function Hero() {
     const prev = currentFrameRef.current - 1;
     if (prev < 0) {
       isLockedRef.current = false;
+      hasResolvedRef.current = true;
       unlockBody();
       return;
     }
@@ -170,76 +180,52 @@ export default function Hero() {
     return rect.top < window.innerHeight && rect.bottom > 0;
   }, []);
 
-  /* ─── Wheel handler (window-level) ─── */
+  /* ─── Wheel handler ─── */
   useEffect(() => {
     if (reduced) return;
-
     const onWheel = (e) => {
-      if (!isHeroInView()) return;
-      if (hasResolvedRef.current) return;
-
+      if (!isHeroInView() || hasResolvedRef.current) return;
       if (!isLockedRef.current) {
         e.preventDefault();
         isLockedRef.current = true;
         lockBody();
         return;
       }
-
       e.preventDefault();
       wheelAccum.current += e.deltaY;
-
-      const threshold = 40;
-      if (Math.abs(wheelAccum.current) >= threshold) {
-        if (wheelAccum.current > 0) {
-          advance();
-        } else {
-          retreat();
-        }
+      if (Math.abs(wheelAccum.current) >= 40) {
+        wheelAccum.current > 0 ? advance() : retreat();
         wheelAccum.current = 0;
       }
     };
-
     window.addEventListener('wheel', onWheel, { passive: false });
     return () => window.removeEventListener('wheel', onWheel);
   }, [reduced, advance, retreat, lockBody, isHeroInView]);
 
-  /* ─── Touch handler (window-level) ─── */
+  /* ─── Touch handler ─── */
   useEffect(() => {
     if (reduced) return;
-
     const onTouchStart = (e) => {
-      if (!isHeroInView()) return;
-      if (hasResolvedRef.current) return;
+      if (!isHeroInView() || hasResolvedRef.current) return;
       touchStartY.current = e.touches[0].clientY;
       touchStartTime.current = Date.now();
-
       if (!isLockedRef.current) {
         isLockedRef.current = true;
         lockBody();
       }
     };
-
     const onTouchMove = (e) => {
       if (!isLockedRef.current) return;
       const deltaY = touchStartY.current - e.touches[0].clientY;
       const elapsed = Date.now() - touchStartTime.current;
-
       if (elapsed < 500 && Math.abs(deltaY) > 40) {
         e.preventDefault();
-        if (deltaY > 0) {
-          advance();
-        } else {
-          retreat();
-        }
+        deltaY > 0 ? advance() : retreat();
         touchStartY.current = e.touches[0].clientY;
         touchStartTime.current = Date.now();
       }
     };
-
-    const onTouchEnd = () => {
-      touchStartY.current = 0;
-    };
-
+    const onTouchEnd = () => { touchStartY.current = 0; };
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd);
@@ -253,11 +239,8 @@ export default function Hero() {
   /* ─── Keyboard handler ─── */
   useEffect(() => {
     if (reduced) return;
-
     const onKeyDown = (e) => {
-      if (!isHeroInView()) return;
-      if (hasResolvedRef.current) return;
-
+      if (!isHeroInView() || hasResolvedRef.current) return;
       if (!isLockedRef.current) {
         if (e.key === 'ArrowDown' || e.key === ' ') {
           e.preventDefault();
@@ -266,21 +249,17 @@ export default function Hero() {
         }
         return;
       }
-
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
-        e.preventDefault();
-        advance();
+        e.preventDefault(); advance();
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-        e.preventDefault();
-        retreat();
+        e.preventDefault(); retreat();
       }
     };
-
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [reduced, advance, retreat, lockBody, isHeroInView]);
 
-  /* ─── Resolution panel animation ─── */
+  /* ─── Resolution panel fade-in ─── */
   useEffect(() => {
     if (!resolveVisible || !resolveRef.current) return;
     resolveRef.current.style.opacity = '0';
@@ -313,14 +292,11 @@ export default function Hero() {
       <p className="cine-desc">{h.desc}</p>
       <div className="hero-actions cine-actions">
         <a href="#donate" className="btn btn-primary btn-lg btn-shimmer hero-cta-primary" onClick={(e) => { e.preventDefault(); resolveScrollTo('donate'); }}>
-          <span className="hero-cta-heart">♥</span>
-          {h.cta}
+          <span className="hero-cta-heart">♥</span> {h.cta}
         </a>
         <a href="#about" className="btn btn-outline hero-cta-secondary" onClick={(e) => { e.preventDefault(); resolveScrollTo('about'); }}>
           {isUrdu ? 'مزید جانیں' : 'Learn More'}
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </a>
       </div>
       <div className="hero-trust cine-trust">
@@ -354,27 +330,32 @@ export default function Hero() {
     <section className="cine-hero" id="home" ref={heroRef} aria-labelledby="hero-title">
       <div className="cine-viewport">
         <div className="cine-stage" style={{ direction: dir }}>
-          {frames.map((f, i) => (
-            <figure
-              key={f.src + i}
-              className={`cine-frame${i === currentFrame ? ' active' : ''}${i === 3 && currentFrame === 3 ? ' cine-frame-enter' : ''}`}
-              aria-hidden={i !== currentFrame}
-            >
-              <img
-                className="cine-frame-img"
-                src={f.src}
-                alt={f.alt}
-                loading={i === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-                fetchPriority={i === 0 ? 'high' : 'low'}
-              />
-              <div className="cine-scrim" aria-hidden="true" />
-              <figcaption className="cine-caption">
-                <span className="cine-caption-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                <span className="cine-caption-text">{f.cap}</span>
-              </figcaption>
-            </figure>
-          ))}
+          {frames.map((f, i) => {
+            const anim = FRAME_ANIM[i];
+            return (
+              <figure
+                key={f.src + i}
+                className={`cine-frame${i === currentFrame ? ' active' : ''} anim-${anim.name}`}
+                aria-hidden={i !== currentFrame}
+                ref={el => { frameRefs.current[i] = el; }}
+                style={{ animationDuration: `${anim.dur}ms` }}
+              >
+                <img
+                  className="cine-frame-img"
+                  src={f.src}
+                  alt={f.alt}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  fetchPriority={i === 0 ? 'high' : 'low'}
+                />
+                <div className="cine-scrim" aria-hidden="true" />
+                <figcaption className="cine-caption">
+                  <span className="cine-caption-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="cine-caption-text">{f.cap}</span>
+                </figcaption>
+              </figure>
+            );
+          })}
 
           {resolution}
 
