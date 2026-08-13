@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLang } from '../LangContext';
 import { useSiteImages } from '../siteImages';
 import { useContent } from '../useContent';
@@ -126,9 +126,6 @@ export default function Hero() {
       setResolveVisible(true);
       setResolveActive(true);
       resolvedRef.current = true;
-      requestAnimationFrame(() => {
-        heroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
       return;
     }
     isAnimatingRef.current = true;
