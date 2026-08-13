@@ -2055,6 +2055,19 @@
   .form-row { grid-template-columns: 1fr; }
   .donate-quote { padding: 28px 24px; }
   .footer-bottom { flex-direction: column; text-align: center; }
+
+  /* Hero: show full building on mobile */
+  .cine-frame-img {
+    object-fit: contain;
+    background: var(--ink);
+  }
+  .cine-scrim {
+    background: linear-gradient(to bottom, rgba(10,6,6,0.45) 0%, rgba(10,6,6,0.05) 40%, rgba(10,6,6,0.65) 100%);
+  }
+  .cine-caption {
+    bottom: clamp(80px, 12vh, 120px);
+  }
+  .cine-rail { display: none; }
 }
 
 @media (max-width: 480px) {
