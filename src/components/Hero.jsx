@@ -58,6 +58,7 @@ export default function Hero() {
   const isLockedRef = useRef(false);
   const isAnimatingRef = useRef(false);
   const resolvedRef = useRef(false);
+  const hasResolvedRef = useRef(false);
   const wheelAccum = useRef(0);
   const touchStartY = useRef(0);
   const touchStartTime = useRef(0);
@@ -119,10 +120,12 @@ export default function Hero() {
     const next = currentFrameRef.current + 1;
     if (next > 3) {
       isLockedRef.current = false;
+      hasResolvedRef.current = true;
       unlockBody();
       setResolveVisible(true);
       setResolveActive(true);
       resolvedRef.current = true;
+      window.scrollBy({ top: 200, behavior: 'smooth' });
       return;
     }
     isAnimatingRef.current = true;
@@ -147,6 +150,7 @@ export default function Hero() {
 
   const resolveScrollTo = useCallback((id) => {
     isLockedRef.current = false;
+    hasResolvedRef.current = true;
     unlockBody();
     setResolveVisible(true);
     setResolveActive(true);
@@ -172,6 +176,7 @@ export default function Hero() {
 
     const onWheel = (e) => {
       if (!isHeroInView()) return;
+      if (hasResolvedRef.current) return;
 
       if (!isLockedRef.current) {
         e.preventDefault();
@@ -204,6 +209,7 @@ export default function Hero() {
 
     const onTouchStart = (e) => {
       if (!isHeroInView()) return;
+      if (hasResolvedRef.current) return;
       touchStartY.current = e.touches[0].clientY;
       touchStartTime.current = Date.now();
 
@@ -250,6 +256,7 @@ export default function Hero() {
 
     const onKeyDown = (e) => {
       if (!isHeroInView()) return;
+      if (hasResolvedRef.current) return;
 
       if (!isLockedRef.current) {
         if (e.key === 'ArrowDown' || e.key === ' ') {
