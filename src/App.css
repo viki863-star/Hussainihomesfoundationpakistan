@@ -86,10 +86,10 @@
 
 .nav-logo-img-wrap {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   flex-shrink: 0;
-  border-radius: 14px;
+  border-radius: 50%;
   overflow: hidden;
   background: #ffffff;
   box-shadow:
@@ -438,22 +438,22 @@
    ============================================ */
 .cine-hero {
   position: relative;
+  height: 100svh;
   background: var(--ink);
   overflow: hidden;
 }
-
-/* Tall scroll track â€” the hero "pins" while the page scrolls through it */
-.cine-track {
-  height: 420vh; /* scroll room: 4 frames + resolution */
+.cine-hero.cine-locked {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
 }
 .cine-viewport {
-  position: sticky;
-  top: 0;
-  height: 100svh;
+  position: relative;
+  height: 100%;
   overflow: hidden;
 }
 
-/* â”€â”€ Stage & frames â”€â”€ */
+/* Stage & frames */
 .cine-stage {
   position: absolute;
   inset: 0;
@@ -462,8 +462,18 @@
   position: absolute;
   inset: 0;
   margin: 0;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity, clip-path;
   backface-visibility: hidden;
+}
+.cine-frame.active {
+  opacity: 1;
+  transform: scale(1);
+}
+.cine-frame.cine-frame-enter {
+  clip-path: inset(0 0 0 0 round 0%);
 }
 .cine-frame-img {
   position: absolute;
@@ -789,6 +799,30 @@
   text-transform: uppercase;
 }
 
+/* Frame indicator dots */
+.cine-indicator {
+  position: absolute;
+  bottom: 36px;
+  right: 24px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+  pointer-events: none;
+}
+.cine-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cine-indicator-dot.active {
+  background: var(--gold-bright);
+  box-shadow: 0 0 12px rgba(251,191,36,0.6);
+  transform: scale(1.3);
+}
+
+
 /* â”€â”€ Reduced motion: calm static composition â”€â”€ */
 .cine-hero-static { min-height: 100svh; display: flex; }
 .cine-hero-static .cine-frame-still {
@@ -801,6 +835,7 @@
 [dir="rtl"] .hero-trust { flex-direction: row-reverse; }
 [dir="rtl"] .hero-cta-secondary svg { transform: scaleX(-1); }
 [dir="rtl"] .cine-rail { right: auto; left: 14px; }
+[dir="rtl"] .cine-indicator { right: auto; left: 24px; }
 
 /* ============================================
    MARQUEE TICKER
@@ -1986,7 +2021,7 @@
 @media (max-width: 1024px) {
   .hero-actions { justify-content: center; }
   .hero-trust { justify-content: center; }
-  .cine-track { height: 380vh; }
+  
   .about-layout { grid-template-columns: 1fr; gap: 48px; }
   .about-img-accent { width: 160px; right: -12px; bottom: -12px; }
   .services-grid { grid-template-columns: repeat(2, 1fr); }
@@ -2052,7 +2087,7 @@
 }
 
 @media (max-width: 480px) {
-  .cine-track { height: 340vh; }
+  
   .hero-stats { grid-template-columns: 1fr; gap: 0; }
   .hero-stat:not(:last-child)::after { display: none; }
   .team-grid { grid-template-columns: 1fr 1fr; }
@@ -2268,9 +2303,9 @@
    FOOTER LOGO
    ============================================ */
 .footer-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -2322,7 +2357,7 @@
 
 /* Smooth theme transition */
 [data-theme="light"] .navbar,
-[data-theme="light"] .cine-hero,
+[data-theme="light"] .cine-hero.cine-locked,
 [data-theme="light"] .services-section,
 [data-theme="light"] .team-section,
 [data-theme="light"] .footer,
