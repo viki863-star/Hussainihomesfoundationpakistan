@@ -301,6 +301,20 @@ export default function Hero() {
     railFillRef.current.style.transform = `scaleY(${p})`;
   }, [currentFrame, resolveVisible]);
 
+  const resolveScrollTo = useCallback((id) => {
+    isLockedRef.current = false;
+    setIsLocked(false);
+    setResolveVisible(true);
+    setResolveActive(true);
+    resolvedRef.current = true;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }, []);
+
   const dir = isUrdu ? 'rtl' : 'ltr';
 
   const resolution = (
@@ -312,11 +326,11 @@ export default function Hero() {
       <h1 className="cine-title" id="hero-title">{h.tagline}</h1>
       <p className="cine-desc">{h.desc}</p>
       <div className="hero-actions cine-actions">
-        <a href="#donate" className="btn btn-primary btn-lg btn-shimmer hero-cta-primary">
+        <a href="#donate" className="btn btn-primary btn-lg btn-shimmer hero-cta-primary" onClick={(e) => { e.preventDefault(); resolveScrollTo('donate'); }}>
           <span className="hero-cta-heart">♥</span>
           {h.cta}
         </a>
-        <a href="#about" className="btn btn-outline hero-cta-secondary">
+        <a href="#about" className="btn btn-outline hero-cta-secondary" onClick={(e) => { e.preventDefault(); resolveScrollTo('about'); }}>
           {isUrdu ? 'مزید جانیں' : 'Learn More'}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
