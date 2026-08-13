@@ -121,12 +121,14 @@ export default function Hero() {
     if (isAnimatingRef.current) return;
     const next = currentFrameRef.current + 1;
     if (next > 3) {
-      // Frame 4 complete → unlock
       isLockedRef.current = false;
       setIsLocked(false);
       setResolveVisible(true);
       setResolveActive(true);
       resolvedRef.current = true;
+      requestAnimationFrame(() => {
+        heroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
       return;
     }
     isAnimatingRef.current = true;
