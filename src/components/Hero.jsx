@@ -20,8 +20,6 @@ import { withBase } from '../paths';
   touched on rare thresholds (journey-complete), never per pixel.
 */
 const HERO_VIDEO = withBase('/images/hero-cinematic.mp4');
-const HERO_VIDEO_MOBILE = withBase('/images/hero-cinematic-mobile.mp4');
-const HERO_POSTER_MOBILE = withBase('/images/hero-poster-mobile.jpg');
 
 /* Scrub tuning */
 const SCRUB_FACTOR = 0.14;   // smoothing: lower = heavier, higher = snappier
@@ -75,7 +73,7 @@ export default function Hero() {
     };
   }, []);
 
-  /* Live mobile/portrait detection → use the dedicated 9:16 video */
+  /* Live mobile detection → landscape video shown in full (object-fit: contain) */
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const mq = window.matchMedia('(max-width: 767px)');
@@ -250,9 +248,8 @@ export default function Hero() {
           <video
             className="cine-video"
             ref={videoRef}
-            key={isMobile ? 'm' : 'd'}
-            src={isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO}
-            poster={isMobile ? HERO_POSTER_MOBILE : imgs.heroFrameSide}
+            src={HERO_VIDEO}
+            poster={imgs.heroFrameSide}
             preload="auto"
             muted
             playsInline

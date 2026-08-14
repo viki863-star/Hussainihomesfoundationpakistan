@@ -1180,6 +1180,7 @@
   .cine-hero { touch-action: pan-y; }
   .cine-hero-touch { cursor: grab; }
   .cine-hero-touch:active { cursor: grabbing; }
+  .cine-canvas .cine-video { object-fit: contain; background: transparent; }
   .cine-copy { bottom: clamp(108px, 16vh, 140px); }
   .cine-title { font-size: clamp(1.75rem, 6.4vw, 2.4rem); }
   .cine-eyebrow { font-size: 0.66rem; gap: 10px; }
