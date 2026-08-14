@@ -1180,14 +1180,15 @@
   .cine-hero { touch-action: pan-y; }
   .cine-hero-touch { cursor: grab; }
   .cine-hero-touch:active { cursor: grabbing; }
-  .cine-canvas .cine-video { object-fit: contain; background: transparent; }
+  .cine-canvas .cine-video { object-fit: cover; object-position: center 20%; background: var(--ink); }
+  .cine-bottom-fade { height: 70px; }
+  .cine-scrim { background: linear-gradient(to bottom, rgba(8,4,4,0.50) 0%, rgba(8,4,4,0.10) 30%, rgba(8,4,4,0.10) 60%, rgba(8,4,4,0.82) 100%); }
   .cine-copy { bottom: clamp(108px, 16vh, 140px); }
   .cine-title { font-size: clamp(1.75rem, 6.4vw, 2.4rem); }
   .cine-eyebrow { font-size: 0.66rem; gap: 10px; }
   .cine-cta { padding: 12px 20px; font-size: 0.88rem; }
   .cine-hint { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); gap: 7px; }
   .cine-rail { display: none; }
-  .cine-bottom-fade { height: 110px; }
   .hero-scroll-swipe {
     display: flex;
     align-items: center;
